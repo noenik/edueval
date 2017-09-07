@@ -1,0 +1,46 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% block title %}Login{% endblock %}
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'main/css/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    {#    {% if next %}#}
+    {#        <div class="alert alert-warning" id="login_notify"><strong>Merk!</strong> Denne siden krever at du logger inn først</div>#}
+    {#    {% elif from %}#}
+    {#        <div class="alert alert-success" id="login_notify"><strong>Konto opprettet!</strong> Du kan nå logge inn</div>#}
+    {#    {% else %}#}
+    {#        <div class="alert alert-info" id="login_notify">Logg på</div>#}
+    {#    {% endif %}#}
+
+    <div class="col-md-4 col-md-offset-4">
+
+        <form action="{% url 'main:login' %}" method="post" accept-charset="utf-8" id="loginform"
+              class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Logg inn</h3>
+            </div>
+            <div class="panel-body">
+
+                {% csrf_token %}
+
+                <span class="field-error">{{ login_form.non_field_errors.as_text }}</span>
+                {% for field in login_form %}
+                    {% if field.label %}
+                        <b class="field-label">{{ field.label }}:</b>
+                    {% endif %}
+                    {{ field }}
+                {% endfor %}
+
+                <br>
+                <input type="hidden" name="next" value="{{ next }}"/>
+                <input class="btn btn-sm btn-success" type="submit" value="Logg inn"/>
+                <input class="btn btn-sm btn-default" type="submit" name="cancel" value="Avbryt"/>
+                <a href="{% url 'main:forgot_pw' %}" class="pull-right">Glemt passord?</a>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

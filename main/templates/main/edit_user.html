@@ -1,0 +1,49 @@
+{% extends 'main_template.html' %}
+{% block title %}Endre Brukerinfo{% endblock %}
+
+{% block content %}
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3>Brukerinfo</h3>
+            </div>
+            <div class="panel-body">
+                <div class="col-md-8 col-md-offset-2">
+                    {% if fdbck %}
+                        <div class="alert alert-success">{{ fdbck }}</div>
+                    {% endif %}
+
+                    {% for line in message %}
+                        <p>{{ line }}</p>
+                    {% endfor %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="user_id" value="{{ userid }}">
+
+                        <h2>Bytte epost eller brukernavn</h2>
+                        <span class="field-error">{{ usrform.non_field_errors.as_text }}</span>
+                        {% for field in usrform %}
+                            {% if field.label %}
+                                <b>{{ field.label }}:</b>
+                            {% endif %}
+                            {{ field }}
+                        {% endfor %}
+                        <button name="mode" value="ch_usr" class="btn btn-success">Fullfør</button>
+
+                        <h2>Bytte passord</h2>
+
+                        <span class="field-error">{{ pwform.non_field_errors.as_text }}</span>
+                        {% for field in pwform %}
+                            <b>{{ field.label }}:</b>
+                            {% if field.html_name == 'old_password' %}
+                                <span class="field-error">{{ field.errors.as_text }}</span>
+                            {% endif %}
+                            {{ field }}
+                        {% endfor %}
+                        <button name="mode" value="ch_pw" class="btn btn-success">Fullfør</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

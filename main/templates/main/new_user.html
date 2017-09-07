@@ -1,0 +1,30 @@
+{% extends 'main_template.html' %}
+{% block title %}Ny Bruker{% endblock %}
+
+{% block content %}
+    <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3>Brukerinfo</h3>
+            </div>
+            <div class="panel-body">
+                <div class="col-md-8 col-md-offset-2">
+                    {% for line in message %}
+                        <p>{{ line }}</p>
+                    {% endfor %}
+                    <form method="POST" action="{% url 'main:newuser' %}">
+                        {% csrf_token %}
+                        <span class="field-error">{{ form.non_field_errors.as_text }}</span>
+                        {% for field in form %}
+                            <b>{{ field.label }}:</b>
+                            {{ field }}
+                        {% endfor %}
+                        <input type="hidden" name="user_id" value="{{ userid }}">
+                        <button class="btn btn-success">Fullfør</button>
+                        <button class="btn btn-default" name="cancel" value="1">Avbryt</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

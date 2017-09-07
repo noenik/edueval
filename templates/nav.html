@@ -1,0 +1,42 @@
+<nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#nav-body" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="{% url 'main:index' %}" class="navbar-brand">EduEval</a>
+        </div>
+        <div class="navbar-collapse collapse" id="nav-body">
+            <ul class="nav navbar-nav container-fluid">
+                <li><a href="#">Test</a></li>
+                {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'administration:home' %}">Administrasjon</a></li>
+                {% else %}
+                    <li class="visible-xs"><a href="{% url 'main:login' %}">Log in</a></li>
+                {% endif %}
+            </ul>
+            {% if request.user.is_authenticated %}
+                <form action="{% url 'main:logout' %}" class="navbar-form navbar-right hidden-xs">
+                    <button class="btn btn-default">Log out</button>
+                </form>
+                <ul class="nav navbar-nav navbar-right visible-xs">
+                    <li><a href="{% url 'main:logout' %}">Log out</a></li>
+                </ul>
+                <p class="navbar-text navbar-right">
+                    Logged in as:
+                    <a href="{% url 'main:ch_usr' %}" class="navbar-link" title="Click here to change your account info">
+                        {{ request.user }}
+                    </a>
+                </p>
+            {% elif loginform %}
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{% url 'main:login' %}">Log in</a></li>
+                </ul>
+            {% endif %}
+    </div>
+    </div>
+</nav>

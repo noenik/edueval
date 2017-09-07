@@ -1,0 +1,30 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EduEval - {% block title %}{% endblock %}</title>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/ionicons/css/ionicons.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'main_stylesheet.css' %}">
+
+    <script type="text/javascript" src="{% static 'vendors/jquery/jquery-3.1.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vendors/jquery/jquery-ui-1.12.1/jquery-ui.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vendors/bootstrap/js/bootstrap.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vendors/bootstrap/js/npm.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'vendors/jquery/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+<div id="outer-wrapper">
+    {% include 'nav.html' %}
+    {% block content %}
+
+        Main Content
+
+    {% endblock %}
+</div>
+</body>
+</html>
