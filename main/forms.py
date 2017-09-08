@@ -11,14 +11,14 @@ errors = {'required': 'Dette feltet er påkrevd', 'invalid': 'Ulovlig verdi',
           'password_too_short': 'Passordet er for kort', 'password_incorrect': _('Feil passord')}
 
 labels = {
-    'username': 'Brukernavn',
-    'old_username': 'Nåværende brukernavn',
-    'password1': 'Passord',
-    'password2': 'Bekreft passord',
-    'email': 'Epost',
-    'old_password': 'Nåværende passord',
-    'new_password1': 'Nytt passord',
-    'new_password2': 'Bekreft nytt passord'
+    'username': 'Username',
+    'old_username': 'Current username',
+    'password1': 'Password',
+    'password2': 'Confirm password',
+    'email': 'Email',
+    'old_password': 'Current password',
+    'new_password1': 'New password',
+    'new_password2': 'Confirm new password'
 }
 
 
@@ -27,10 +27,10 @@ class LoginForm(forms.Form):
     Login form class. Creates and handles the login form.
     """
 
-    username = forms.CharField(max_length=255, required=False, error_messages=errors, label='Brukernavn',
-                               widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Brukernavn'}))
-    password = forms.CharField(required=False, error_messages=errors, label='Passord',
-                               widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Passord'}))
+    username = forms.CharField(max_length=255, required=False, error_messages=errors, label='Username',
+                               widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
+    password = forms.CharField(required=False, error_messages=errors, label='Password',
+                               widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
 
     def clean(self):
         """

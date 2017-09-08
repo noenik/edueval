@@ -20,7 +20,7 @@
         <form action="{% url 'main:login' %}" method="post" accept-charset="utf-8" id="loginform"
               class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Logg inn</h3>
+                <h3 class="panel-title">Log in</h3>
             </div>
             <div class="panel-body">
 
@@ -36,9 +36,9 @@
 
                 <br>
                 <input type="hidden" name="next" value="{{ next }}"/>
-                <input class="btn btn-sm btn-success" type="submit" value="Logg inn"/>
-                <input class="btn btn-sm btn-default" type="submit" name="cancel" value="Avbryt"/>
-                <a href="{% url 'main:forgot_pw' %}" class="pull-right">Glemt passord?</a>
+                <input class="btn btn-sm btn-success" type="submit" value="Log in"/>
+                <input class="btn btn-sm btn-default" type="submit" name="cancel" value="Cancel"/>
+                <a href="{% url 'main:forgot_pw' %}" class="pull-right">Forgot password?</a>
             </div>
         </form>
     </div>

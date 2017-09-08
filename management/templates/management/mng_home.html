@@ -1,0 +1,19 @@
+{% extends 'main_template.html' %}
+{% block title %}Management{% endblock %}
+
+{% block content %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            My Courses
+        </div>
+        <div class="panel-body">
+            {% if course %}
+                {% for course in courses %}
+                    {{ course }}
+                {% endfor %}
+            {% else %}
+                You have no courses
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

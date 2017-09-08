@@ -12,7 +12,7 @@
         </div>
         <div class="navbar-collapse collapse" id="nav-body">
             <ul class="nav navbar-nav container-fluid">
-                <li><a href="#">Test</a></li>
+                <li><a href="{% url 'manage:home' %}">Manage</a></li>
                 {% if request.user.is_authenticated %}
                     <li><a href="{% url 'administration:home' %}">Administrasjon</a></li>
                 {% else %}
