@@ -20,6 +20,7 @@
                             {{ field }}
                         {% endfor %}
                         <input type="hidden" name="user_id" value="{{ userid }}">
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
                         <button class="btn btn-success">OK</button>
                         <button class="btn btn-default" name="cancel" value="1">Cancel</button>
                     </form>

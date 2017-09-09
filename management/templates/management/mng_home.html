@@ -2,17 +2,59 @@
 {% block title %}Management{% endblock %}
 
 {% block content %}
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            My Courses
+    <div class="col-md-8 col-md-offset-2">
+        <div class="row">
+            <div class="col-md-4">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        {{ courseform.code }}
+                        <span class="input-group-btn">
+                        <button class="btn btn-success col-md-12">Add course</button>
+                        </span>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="panel-body">
-            {% if course %}
-                {% for course in courses %}
-                    {{ course }}
-                {% endfor %}
-            {% else %}
-                You have no courses
+        <div class="row">
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        My Courses
+                    </div>
+                    <div class="panel-body">
+                        {% if courses %}
+                            <div class="list-group">
+                                {% for course in courses %}
+                                    <a href="{% url 'manage:home_course' course=course.code %}"
+                                       class="list-group-item">{{ course.code }}</a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            You have no courses
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% if selected_course %}
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            Exams for {{ selected_course }}
+                        </div>
+                        <div class="panel-body">
+                            {% if exams %}
+                                <ul>
+                                    {% for exam in exams %}
+                                        <li>{{ exam.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                There are no exams in this course
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>

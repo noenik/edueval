@@ -12,9 +12,8 @@
         </div>
         <div class="navbar-collapse collapse" id="nav-body">
             <ul class="nav navbar-nav container-fluid">
-                <li><a href="{% url 'manage:home' %}">Manage</a></li>
                 {% if request.user.is_authenticated %}
-                    <li><a href="{% url 'administration:home' %}">Administrasjon</a></li>
+                    <li><a href="{% url 'manage:home' %}">Manage</a></li>
                 {% else %}
                     <li class="visible-xs"><a href="{% url 'main:login' %}">Log in</a></li>
                 {% endif %}

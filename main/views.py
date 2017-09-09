@@ -110,7 +110,11 @@ def handle_new_user(request):
 
             if user:
                 login(request, user)
-                return redirect('administration:home')
+                next_url = request.POST.get('next')
+                if next_url:
+                    return redirect(next_url)
+                else:
+                    return redirect('main:index')
 
         return render(request, 'main/new_user.html',
                       {'form': userform, 'userid': userid, 'message': message})
