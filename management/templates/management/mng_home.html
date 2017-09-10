@@ -15,6 +15,19 @@
                     </div>
                 </form>
             </div>
+            <div class="col-md-4">
+                {% if selected_course %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ examform.name }}
+                            <span class="input-group-btn">
+                            <button class="btn btn-success col-md-12">Add exam</button>
+                        </span>
+                        </div>
+                    </form>
+                {% endif %}
+            </div>
         </div>
         <div class="row">
             <div class="col-md-4">
@@ -26,7 +39,7 @@
                         {% if courses %}
                             <div class="list-group">
                                 {% for course in courses %}
-                                    <a href="{% url 'manage:home_course' course=course.code %}"
+                                    <a href="{% url 'manage:home_course' course=course.slug %}"
                                        class="list-group-item">{{ course.code }}</a>
                                 {% endfor %}
                             </div>
@@ -40,15 +53,16 @@
                 <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            Exams for {{ selected_course }}
+                            Exams for {{ selected_course.code }}
                         </div>
                         <div class="panel-body">
                             {% if exams %}
-                                <ul>
+                                <div class="list-group">
                                     {% for exam in exams %}
-                                        <li>{{ exam.name }}</li>
+                                        <a class="list-group-item"
+                                           href="{% url 'manage:exam' exam_id=exam.id %}">{{ exam.name }}</a>
                                     {% endfor %}
-                                </ul>
+                                </div>
                             {% else %}
                                 There are no exams in this course
                             {% endif %}
