@@ -2,14 +2,42 @@
 {% block title %}Exam{% endblock %}
 
 {% block content %}
-    <div class="page-header">
-        <h1>{{ exam.name }}</h1>
-    </div>
+    <div class="col-md-8 col-md-offset-2">
+        <div class="page-header">
+            <h1>{{ exam.name }}</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <form method="post" class="input-group">
+                    {% csrf_token %}
+                    <label for="add-qs" class="sr-only">Add questions:</label>
+                    <input type="number" id="add-qs" name="addQs" class="form-control"
+                           placeholder="Number of questions">
+                    <span class="input-group-btn">
+                    <button class="btn btn-default">Add</button>
+                </span>
+                </form>
+            </div>
+        </div>
 
-    {% for q in questions %}
-        <label for="eval">
-            {{ q }}.
-        </label>
-        <input type="number" id="eval">
-    {% endfor %}
+        {#        {% for q in questions %}#}
+        {#            <label for="eval">#}
+        {#                {{ q }}.#}
+        {#            </label>#}
+        {#            <input type="number" id="eval">#}
+        {#        {% endfor %}#}
+
+        <div class="row">
+            <form method="post" class="col-md-2">
+                {% csrf_token %}
+                {{ management_form }}
+                {% for f in question_formset %}
+                    <b>Question {{ f.num }}:</b>
+                    <label for="{{ f.form.name }}" class="sr-only">{{ f.form.label }}:</label>
+                    {{ f.form.teacher_eval }}
+                {% endfor %}
+            <button class="btn btn-success">Submit</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.forms.formsets import formset_factory
 from django.shortcuts import render
 import management.forms as forms
 import management.models as mdls
@@ -36,4 +37,21 @@ def mng_home(request, course=None):
 
 def exam(request, exam_id):
     exm = mdls.Exam.objects.get(pk=exam_id)
-    return render(request, 'management/exam.html', {'exam': exm})
+    context = {'exam': exm}
+
+    if request.POST:
+        add_qs = request.POST.get('addQs')
+        if add_qs:
+            QuestionFormset = formset_factory(forms.ExamQuestionForm, extra=int(add_qs))
+            formset = QuestionFormset()
+            fs = [{'num': i, 'form': form} for i, form in zip(range(1, len(formset)+1), formset)]
+            context['question_formset'] = fs
+            context['management_form'] = formset.management_form
+        else:
+            QuestionFormset = formset_factory(forms.ExamQuestionForm)
+            fs = QuestionFormset(request.POST)
+
+            if fs.is_valid():
+                fs.save()
+
+    return render(request, 'management/exam.html', context)
