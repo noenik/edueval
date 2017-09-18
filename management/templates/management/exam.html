@@ -7,7 +7,7 @@
             <h1>{{ exam.name }}</h1>
         </div>
         <div class="row">
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <form method="post" class="input-group">
                     {% csrf_token %}
                     <label for="add-qs" class="sr-only">Add questions:</label>
@@ -28,7 +28,7 @@
         {#        {% endfor %}#}
 
         <div class="row">
-            <form method="post" class="col-md-2">
+            <form method="post" class="col-md-3">
                 {% csrf_token %}
                 {{ management_form }}
                 {% for f in question_formset %}
