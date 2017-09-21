@@ -1,0 +1,39 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% block title %}Evaluate{% endblock %}
+
+{% block head %}
+    <script type="text/javascript" src="{% static 'evaluate/js/evaluate.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="col-md-8 col-md-offset-2">
+        <div class="page-header">
+            <h1>
+                Evaluation of {{ exam.name }}
+                {% if exam.course.description %}
+                    <small>
+                        For the course {{ exam.course.description }}
+                    </small>
+                {% endif %}
+            </h1>
+        </div>
+
+        <div class="row">
+            <form method="post" class="col-md-4" id="eval-form">
+                {% csrf_token %}
+                {{ formset.management_form }}
+                {% for ef in formset %}
+                    <div class="question-eval-wrapper">
+                        <b>Question <span class="question_num">{{ ef.q_num.value }}:</span></b>
+                        <label for="{{ ef.evaluation.name }}" class="sr-only">{{ ef.evaluation.label }}</label>
+                        {% for field in ef %}
+                            {{ field }}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button class="btn btn-success">Submit</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

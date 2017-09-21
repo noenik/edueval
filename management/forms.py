@@ -1,4 +1,4 @@
-from .models import Course, Exam, ExamQuestion
+from management import models
 from django import forms
 
 
@@ -9,7 +9,7 @@ class CourseForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({'class': 'form-control'})
 
     class Meta:
-        model = Course
+        model = models.Course
         fields = ['code']
 
 
@@ -20,16 +20,31 @@ class ExamForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({'class': 'form-control'})
 
     class Meta:
-        model = Exam
+        model = models.Exam
         fields = ['name']
 
 
 class ExamQuestionForm(forms.ModelForm):
+    """
+    Modelform for Exam Questions
+    """
     def __init__(self, *args, **kwargs):
         super(ExamQuestionForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             self.fields[field].widget.attrs.update({'class': 'form-control'})
 
     class Meta:
-        model = ExamQuestion
-        fields = ['teacher_eval']
+        model = models.ExamQuestion
+        fields = ['teacher_eval', 'number']
+        widgets = {'number': forms.HiddenInput()}
+
+
+class BaseExamQuestionFormSet(forms.BaseModelFormSet):
+    """
+    A base form set for sets of exam question forms. Used to override built-in modelformset so that the ExamQuestionForm
+    above can be used
+    """
+    def __init__(self, *args, **kwargs):
+        super(BaseExamQuestionFormSet, self).__init__(*args, **kwargs)
+        self.form = ExamQuestionForm
+

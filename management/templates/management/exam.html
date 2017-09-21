@@ -1,43 +1,59 @@
 {% extends 'main_template.html' %}
+{% load static %}
 {% block title %}Exam{% endblock %}
+
+{% block head %}
+    <script type="text/javascript" src="{% static 'management/js/exam.js' %}"></script>
+{% endblock %}
 
 {% block content %}
     <div class="col-md-8 col-md-offset-2">
         <div class="page-header">
             <h1>{{ exam.name }}</h1>
         </div>
-        <div class="row">
-            <div class="col-md-3">
-                <form method="post" class="input-group">
-                    {% csrf_token %}
-                    <label for="add-qs" class="sr-only">Add questions:</label>
-                    <input type="number" id="add-qs" name="addQs" class="form-control"
-                           placeholder="Number of questions">
-                    <span class="input-group-btn">
-                    <button class="btn btn-default">Add</button>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <label for="add-qs" class="sr-only">Add questions:</label>
+                        <input type="number" id="add-qs" name="addQs" class="form-control"
+                               placeholder="Number of questions">
+                        <span class="input-group-btn">
+                    <button class="btn btn-success">Add</button>
                 </span>
-                </form>
+                    </div>
+                </div>
             </div>
-        </div>
 
-        {#        {% for q in questions %}#}
-        {#            <label for="eval">#}
-        {#                {{ q }}.#}
-        {#            </label>#}
-        {#            <input type="number" id="eval">#}
-        {#        {% endfor %}#}
-
-        <div class="row">
-            <form method="post" class="col-md-3">
-                {% csrf_token %}
-                {{ management_form }}
-                {% for f in question_formset %}
-                    <b>Question {{ f.num }}:</b>
-                    <label for="{{ f.form.name }}" class="sr-only">{{ f.form.label }}:</label>
-                    {{ f.form.teacher_eval }}
-                {% endfor %}
-            <button class="btn btn-success">Submit</button>
-            </form>
-        </div>
+            <div class="row">
+                <div class="col-md-3" id="q_form">
+                    {{ qs_mdlformset.management_form }}
+                    {{ qs_mdlformset.non_form_errors }}
+                    <ul class="list-group">
+                        {% for qf in qs_mdlformset %}
+                            <li class="list-group-item q_form_wrapper">
+                                <b>Question <span class="question_num"></span></b>
+                                <label for="{{ qf.name }}" class="sr-only">{{ qf.label }}</label>
+                                {% for field in qf %}
+                                    {{ field.errors }}
+                                    {{ field }}
+                                {% endfor %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                    <button class="btn btn-success" name="save_qs" value="1">Confirm</button>
+                </div>
+                <div>
+                    {% if url_link %}
+                        <label for="eval-url">Evaluation url:</label>
+                        <input id="eval-url" value="{{ request.get_host }}{% url 'eval:evaluate' url_hash=url_link.url_hash %}"
+                               class="form-control" contentEditable="false">
+                    {% else %}
+                        <button name="get_link" class="btn btn-primary" value="1">Get evaluation link!</button>
+                    {% endif %}
+                </div>
+            </div>
+        </form>
     </div>
 {% endblock %}

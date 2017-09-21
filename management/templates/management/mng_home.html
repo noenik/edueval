@@ -37,6 +37,7 @@
                     </div>
                     <div class="panel-body">
                         {% if courses %}
+                            Select a course to browse exams:
                             <div class="list-group">
                                 {% for course in courses %}
                                     <a href="{% url 'manage:home_course' course=course.slug %}"
@@ -57,6 +58,7 @@
                         </div>
                         <div class="panel-body">
                             {% if exams %}
+                                Select exam to see and edit details:
                                 <div class="list-group">
                                     {% for exam in exams %}
                                         <a class="list-group-item"
