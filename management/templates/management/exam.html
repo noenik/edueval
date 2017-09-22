@@ -11,6 +11,16 @@
         <div class="page-header">
             <h1>{{ exam.name }}</h1>
         </div>
+        {% if message %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-success">
+                        {{ message }}
+                        <i class="glyphicon glyphicon-remove pull-right"></i>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
             <div class="row">
@@ -33,12 +43,24 @@
                     <ul class="list-group">
                         {% for qf in qs_mdlformset %}
                             <li class="list-group-item q_form_wrapper">
-                                <b>Question <span class="question_num"></span></b>
-                                <label for="{{ qf.name }}" class="sr-only">{{ qf.label }}</label>
-                                {% for field in qf %}
-                                    {{ field.errors }}
-                                    {{ field }}
-                                {% endfor %}
+                                <div class="row">
+                                    <b>Question <span class="question_num"></span></b>
+                                    <label for="{{ qf.name }}" class="sr-only">{{ qf.label }}</label>
+                                </div>
+                                <div class="row">
+                                    <div class="form-inline">
+                                        {% for field in qf %}
+                                            <div class="form-group">
+                                                {{ field.errors }}
+                                                {{ field }}
+                                            </div>
+                                        {% endfor %}
+                                        <div class="form-group question-del-btn">
+                                            <i class="glyphicon glyphicon-remove pull-right"></i>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </li>
                         {% endfor %}
                     </ul>

@@ -12,6 +12,12 @@ import datetime
 
 @login_required
 def mng_home(request, course=None):
+    """
+    View for management home page
+    :param request:
+    :param course:
+    :return:
+    """
     courses = mdls.Course.objects.all()
     course_form = forms.CourseForm(request.POST or None)
     context = {'courses': courses, 'courseform': course_form}
@@ -40,6 +46,12 @@ def mng_home(request, course=None):
 
 @login_required
 def exam(request, exam_id):
+    """
+    View for a detailed page for an exam
+    :param request:
+    :param exam_id:
+    :return:
+    """
     exm = mdls.Exam.objects.get(pk=exam_id)
     qs = mdls.ExamQuestion.objects.filter(exam=exm).order_by('number')
 
@@ -65,9 +77,13 @@ def exam(request, exam_id):
         if fs.is_valid():
             for form in fs:
                 if form.is_valid():
-                    instance = form.save(commit=False)
-                    instance.exam = exm
-                    instance.save()
+                    if form.cleaned_data.get('delete'):
+                        form.cleaned_data.get('id').delete()
+                    else:
+                        instance = form.save(commit=False)
+                        instance.exam = exm
+                        instance.save()
+            context['message'] = "Exam successfully saved"
     else:
         context['qs_mdlformset'] = QuestionModelFormSet(queryset=qs)
 
@@ -83,6 +99,14 @@ def exam(request, exam_id):
 
 
 def generate_link(exm, exp=None):
+    """
+    Generate a url hash and link it to an exam. Creates a ExamEvaluationLink object that contains the hash,
+    link to an exam, and and expiration date. By default the link expires 3 days after creation. Can be overridden
+    by giving the exp argument.
+    :param exm: Exam object to link a hash with
+    :param exp: Expiration day
+    :return: The ExamEvaluationLink object
+    """
     url_hash = ''.join(random.choices(string.ascii_uppercase + string.digits, k=24))
     el = mdls.ExamEvaluationLink(url_hash=url_hash, exam=exm)
 

@@ -27,12 +27,23 @@ $(function() {
         }
     });
 
+    /**
+     * Handler for click on the copy buttond on the link field
+     */
     $('#copy-link-btn').click(function(e) {
         e.preventDefault();
         var $url_field = $(this).parent().parent().find('#eval-url');
         $url_field.select();
         document.execCommand("copy");
         return false;
+    });
+
+    $('.question-del-btn').click(function() {
+       var $delete_field = $(this).parent().find('input').filter(function() {
+           return this.id.match(/id_form-\d*-delete/);
+        });
+
+       $delete_field.prop('checked', true);
     });
 
 });

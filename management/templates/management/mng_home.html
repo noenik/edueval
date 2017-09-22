@@ -15,7 +15,7 @@
                     </div>
                 </form>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4 hidden-xs hidden-sm">
                 {% if selected_course %}
                     <form method="post">
                         {% csrf_token %}
@@ -51,6 +51,17 @@
                 </div>
             </div>
             {% if selected_course %}
+                <div class="col-md-4 visible-xs visible-sm">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            {{ examform.name }}
+                            <span class="input-group-btn">
+                            <button class="btn btn-success col-md-12">Add exam</button>
+                        </span>
+                        </div>
+                    </form>
+                </div>
                 <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">

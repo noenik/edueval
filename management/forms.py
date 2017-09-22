@@ -28,6 +28,8 @@ class ExamQuestionForm(forms.ModelForm):
     """
     Modelform for Exam Questions
     """
+    delete = forms.BooleanField(required=False)
+
     def __init__(self, *args, **kwargs):
         super(ExamQuestionForm, self).__init__(*args, **kwargs)
         for field in self.fields:
