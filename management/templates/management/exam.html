@@ -44,11 +44,19 @@
                     </ul>
                     <button class="btn btn-success" name="save_qs" value="1">Confirm</button>
                 </div>
-                <div>
+                <div class="col-md-3">
                     {% if url_link %}
                         <label for="eval-url">Evaluation url:</label>
-                        <input id="eval-url" value="{{ request.get_host }}{% url 'eval:evaluate' url_hash=url_link.url_hash %}"
-                               class="form-control" contentEditable="false">
+                        <div class="input-group">
+                            <input id="eval-url"
+                                   value="{{ request.get_host }}{% url 'eval:evaluate' url_hash=url_link.url_hash %}"
+                                   class="form-control" contentEditable="false">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" title="Copy link to clipboard" id="copy-link-btn">
+                                    <i class="glyphicon glyphicon-copy"></i>
+                                </button>
+                            </span>
+                        </div>
                     {% else %}
                         <button name="get_link" class="btn btn-primary" value="1">Get evaluation link!</button>
                     {% endif %}

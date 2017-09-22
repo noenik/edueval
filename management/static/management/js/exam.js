@@ -27,4 +27,12 @@ $(function() {
         }
     });
 
+    $('#copy-link-btn').click(function(e) {
+        e.preventDefault();
+        var $url_field = $(this).parent().parent().find('#eval-url');
+        $url_field.select();
+        document.execCommand("copy");
+        return false;
+    });
+
 });
