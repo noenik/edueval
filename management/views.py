@@ -106,12 +106,12 @@ def generate_link(exm, exp=None):
     :param exp: Expiration day
     :return: The ExamEvaluationLink object
     """
-    url_hash = ''.join(random.choices(string.ascii_uppercase + string.digits, k=24))
+    url_hash = ''.join(random.choices(string.ascii_letters + string.digits, k=24))
     el = mdls.ExamEvaluationLink(url_hash=url_hash, exam=exm)
 
     if exp:
         el.expires = exp
 
-    obj = el.save()
+    el.save()
 
-    return obj
+    return el
