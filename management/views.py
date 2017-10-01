@@ -68,7 +68,7 @@ def exam(request, exam_id):
         add_qs = 0
 
     QuestionModelFormSet = modelformset_factory(mdls.ExamQuestion, fields=('teacher_eval',),
-                                                formset=forms.BaseExamQuestionFormSet, extra=add_qs)
+                                                formset=forms.BaseExamQuestionFormSet, extra=add_qs, can_delete=True)
     context = {'exam': exm, 'questions': qs}
 
     if request.POST.get('save_qs'):
@@ -77,7 +77,7 @@ def exam(request, exam_id):
         if fs.is_valid():
             for form in fs:
                 if form.is_valid():
-                    if form.cleaned_data.get('delete'):
+                    if form.cleaned_data.get('DELETE'):
                         form.cleaned_data.get('id').delete()
                     else:
                         instance = form.save(commit=False)
@@ -90,7 +90,6 @@ def exam(request, exam_id):
     if request.POST.get('get_link'):
         active_link = mdls.ExamEvaluationLink.objects.filter(exam=exm, expires__gte=datetime.datetime.today()).last()
         if active_link:
-            print(active_link.url_hash)
             context['url_link'] = active_link
         else:
             context['url_link'] = generate_link(exm)

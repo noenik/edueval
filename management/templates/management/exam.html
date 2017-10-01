@@ -42,26 +42,24 @@
                     {{ qs_mdlformset.non_form_errors }}
                     <ul class="list-group">
                         {% for qf in qs_mdlformset %}
-                            <li class="list-group-item q_form_wrapper">
-                                <div class="row">
-                                    <b>Question <span class="question_num"></span></b>
-                                    <label for="{{ qf.name }}" class="sr-only">{{ qf.label }}</label>
-                                </div>
-                                <div class="row">
-                                    <div class="form-inline">
-                                        {% for field in qf %}
-                                            <div class="form-group">
-                                                {{ field.errors }}
-                                                {{ field }}
-                                            </div>
-                                        {% endfor %}
-                                        <div class="form-group question-del-btn">
-                                            <i class="glyphicon glyphicon-remove pull-right"></i>
-                                        </div>
+                            {% if not qf.DELETE.value %}
+                                <li class="list-group-item q_form_wrapper">
+                                    <div class="row">
+                                        <b>Question <span class="question_num"></span></b>
+                                        <label for="{{ qf.name }}" class="sr-only">{{ qf.label }}</label>
                                     </div>
-
-                                </div>
-                            </li>
+                                    <div class="row">
+                                        <div class="col-md-10">
+                                            {{ qf.teacher_eval }}
+                                        </div>
+                                        <div class="col-md-2">
+                                            {{ qf.DELETE }}
+                                        </div>
+                                        {{ qf.id }}
+                                        {{ qf.number }}
+                                    </div>
+                                </li>
+                            {% endif %}
                         {% endfor %}
                     </ul>
                     <button class="btn btn-success" name="save_qs" value="1">Confirm</button>
