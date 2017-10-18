@@ -125,3 +125,12 @@ STATIC_URL = '/static/'
 STATIC_ROOT = 'static'
 
 LOGIN_URL = '/login/'
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'dev.trollkode@gmail.com'
+# EMAIL_HOST_PASSWORD = '2tN?,9%B'
+EMAIL_HOST_PASSWORD = 'trollkode1234'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+

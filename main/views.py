@@ -65,22 +65,21 @@ def forgot_password(request):
         user_match = User.objects.filter(email=email)
 
         if user_match.count() is 0:
-            errors.append('Eposten du har oppgitt finnes ikke, har du opgitt riktig adresse?')
+            errors.append('The provided email does not exist')
         else:
             user = user_match[0]
             pw = User.objects.make_random_password()
             user.set_password(pw)
             user.save()
 
-            message = 'Her er ditt nye passord for www.byggordboka.no:\n\n' \
+            message = 'Here is your new password for www.edueval.no:\n\n' \
                       + pw \
-                      + '\n\nBrukernavnet ditt er: ' + user.username \
-                      + '\n\nDet anbefales at du bytter til et nytt passord straks du har fått tilgang til kontoen din igjen'
-            subject = 'Byggordboka - nytt passord'
-            from_email = 'ikkesvar@trollkode.no'
+                      + '\n\nYour username is: ' + user.username
+            subject = 'Edueval - new passord'
+            from_email = 'dev.trollkode@gmail.com'
             send_mail(subject, message, from_email, [email])
 
-            errors.append('En epost har blitt sendt til din innboks. <a href="/">Tilbake til forsiden</a>')
+            errors.append('An email has been sent to your inbox. <a href="/">Back to the front page</a>')
 
     return render(request, 'main/forgot_password.html', {'errors': errors})
 
