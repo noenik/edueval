@@ -1,37 +1,48 @@
 let findNum = /^mf(\d+)$/;
 
 $(function () {
-    let o = initSvg(),
-        x = Array.from(new Array(101), (x, i) => i / 10),
-        v = [[-1, 0, 2, 4], [1, 4, 6], [3, 6, 9], [7, 9, 10, 11]],
-        $mfs = $('[class^=mf]'),
-        v2 = getVectors($mfs);
+    let $svgWrapper = $("#svg-wrapper"),
+        $questionList = $('#question-list'),
+        o = initSvg('#svg-wrapper', $svgWrapper.width(), 300),
+        x = Array.from(new Array(101), (x, i) => i / 10);
 
-    let circles = [],
-        vs = [];
-    v2.forEach(vec => {
-        let vect = [];
-        vec.forEach((val, i) => {
-            let y;
-            if(i === 0 || i === vec.length - 1) {
-                y = 0;
-            } else
-                y = 1;
-            circles.push({x: val.v, y: y, field: val.field});
-            vect.push(val.v);
+
+    $questionList.find('a').click(function () {
+        o.svg.selectAll('*').remove();
+
+        let circles = [],
+            vs = [],
+            $mfs = $(this).find('[class^=mf]'),
+            v2 = getVectors($mfs);
+
+        v2.forEach(vec => {
+            let vect = [];
+            vec.forEach((val, i) => {
+                let y;
+                if (i === 0 || i === vec.length - 1) {
+                    y = 0;
+                } else
+                    y = 1;
+                circles.push({x: val.v, y: y, field: val.field});
+                vect.push(val.v);
+            });
+            vs.push(vect);
         });
-        vs.push(vect);
-    });
 
-    drawMf(vs, x, o);
-
-    drawGrabHandles(circles, o);
-
-    $mfs.change(function () {
-        o.svg.selectAll("path").remove();
-        vs = getVectors($mfs).map(a => a.map(b => b.v));
         drawMf(vs, x, o);
+
+        drawGrabHandles(circles, o);
+
+        $mfs.change(function () {
+            o.svg.selectAll("path").remove();
+            vs = getVectors($mfs).map(a => a.map(b => b.v));
+            drawMf(vs, x, o);
+        });
+
     });
+
+    $questionList.find('a').first().click();
+
 
 });
 
@@ -41,7 +52,7 @@ function getVectors($fields) {
     $fields.each(function () {
         let eleClass = $(this).prop('class');
         let num = parseInt(findNum.exec(eleClass)[1]),
-            i = num-1;
+            i = num - 1;
 
         if (typeof vect[i] === 'undefined') {
             vect[i] = [];
@@ -96,22 +107,24 @@ function mf(x, v) {
 
 }
 
-function initSvg() {
+function initSvg(selector, width, height) {
     let obj = {};
-    let svg = d3.select("#mf"),
+    let svg = d3.select(selector).append('svg')
+            .attr('width', width)
+            .attr('height', height),
         margin = {top: 20, right: 20, bottom: 30, left: 50},
-        width = +svg.attr("width") - margin.left - margin.right,
-        height = +svg.attr("height") - margin.top - margin.bottom;
+        w = width - margin.left - margin.right,
+        h = height - margin.top - margin.bottom;
 
     obj.svg = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     obj.x = d3.scaleLinear()
-        .range([0, width]);
+        .range([0, w]);
 
     obj.y = d3.scaleLinear()
-        .range([height, 0]);
+        .range([h, 0]);
 
-    obj.height = height;
-    obj.width = width;
+    obj.height = h;
+    obj.width = w;
 
     return obj;
 }
@@ -130,20 +143,26 @@ function drawGrabHandles(data, o) {
     o.svg.selectAll("circles")
         .data(data)
         .enter().append("circle")
-        .attr("cx", function(d) { return x(d.x - 1); })
-        .attr("cy", function (d) { return y(d.y); })
+        .attr("cx", function (d) {
+            return x(d.x - 1);
+        })
+        .attr("cy", function (d) {
+            return y(d.y);
+        })
         .attr("r", 8)
-        .style("fill", function (d, i) { return "#550000"; })
+        .style("fill", function (d, i) {
+            return "#550000";
+        })
         .call(d3.drag().subject(function () {
             let t = d3.select(this);
             return {x: t.attr("cx"), y: t.attr("cy")}
         })
-            .on("drag", function(d) {
+            .on("drag", function (d) {
                 let curVal = parseInt(d.field.val()),
                     eventVal = d3.event.x,
                     newTemp = o.x.invert(eventVal),
                     newVal = Math.round(newTemp);
-                if(newVal !== curVal){
+                if (newVal !== curVal) {
                     d.field.val(newVal);
                     d.field.change();
                     d3.select(this).attr("cx", d.x = x(newVal));
@@ -196,7 +215,9 @@ function drawLineGraph(data, o) {
             .style("stroke", colors[i])
             .style("stroke-width", "2px")
             .attr("d", line)
-            .attr("data-legend", function() { return legend[i] });
+            .attr("data-legend", function () {
+                return legend[i]
+            });
 
     });
     // o.svg.append("g")

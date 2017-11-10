@@ -20,20 +20,48 @@
         </div>
 
         <div class="row">
-            <form method="post" class="col-md-4" id="eval-form">
-                {% csrf_token %}
-                {{ formset.management_form }}
-                {% for ef in formset %}
-                    <div class="question-eval-wrapper">
-                        <b>Question <span class="question_num">{{ ef.q_num.value }}:</span></b>
-                        <label for="{{ ef.evaluation.name }}" class="sr-only">{{ ef.evaluation.label }}</label>
-                        {% for field in ef %}
-                            {{ field }}
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-                <button class="btn btn-success">Submit</button>
-            </form>
+            {#            <form method="post" class="col-md-4" id="eval-form">#}
+            {#                {% csrf_token %}#}
+            {#                {{ formset.management_form }}#}
+            {#                {% for ef in formset %}#}
+            {#                    <div class="question-eval-wrapper">#}
+            {#                        <b>Question <span class="question_num">{{ ef.q_num.value }}:</span></b>#}
+            {#                        <label for="{{ ef.evaluation.name }}" class="sr-only">{{ ef.evaluation.label }}</label>#}
+            {#                        {% for field in ef %}#}
+            {#                            {{ field }}#}
+            {#                        {% endfor %}#}
+            {#                    </div>#}
+            {#                {% endfor %}#}
+            {#                <button class="btn btn-success">Submit</button>#}
+            {#            </form>#}
+            <div class="col-md-3">
+                <div class="list-group" id="question-list">
+                    {% for q in questions %}
+                        <a href="#" class="list-group-item">
+                            Question {{ q.number }}
+
+                            <input class="mf1" type="hidden" value="-1">
+                            <input class="mf1" type="hidden" value="0">
+                            <input class="mf1" type="hidden" value="2">
+                            <input class="mf1" type="hidden" value="4">
+                            <input class="mf2" type="hidden" value="1">
+                            <input class="mf2" type="hidden" value="4">
+                            <input class="mf2" type="hidden" value="6">
+                            <input class="mf3" type="hidden" value="3">
+                            <input class="mf3" type="hidden" value="6">
+                            <input class="mf3" type="hidden" value="9">
+                            <input class="mf4" type="hidden" value="7">
+                            <input class="mf4" type="hidden" value="9">
+                            <input class="mf4" type="hidden" value="10">
+                            <input class="mf4" type="hidden" value="11">
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-md-4 col-md-offset-2">
+                <div id="current-question"></div>
+                <div id="svg-wrapper"></div>
+            </div>
         </div>
     </div>
 {% endblock %}
