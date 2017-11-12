@@ -18,6 +18,34 @@
                 {% endif %}
             </h1>
         </div>
+    </div>
+    <div id="sections">
+        {% for section in sections %}
+            <input type="hidden" value="{{ section.name }}">
+        {% endfor %}
+    </div>
+    {% for section in sections %}
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <h2>Define {{ section.name }} of questions</h2>
+                <div id="svg-{{ section.name }}"></div>
+
+                <input class="mf1" type="hidden" value="-1">
+                <input class="mf1" type="hidden" value="0">
+                <input class="mf1" type="hidden" value="2">
+                <input class="mf1" type="hidden" value="4">
+                <input class="mf2" type="hidden" value="1">
+                <input class="mf2" type="hidden" value="4">
+                <input class="mf2" type="hidden" value="6">
+                <input class="mf3" type="hidden" value="3">
+                <input class="mf3" type="hidden" value="6">
+                <input class="mf3" type="hidden" value="9">
+                <input class="mf4" type="hidden" value="7">
+                <input class="mf4" type="hidden" value="9">
+                <input class="mf4" type="hidden" value="10">
+                <input class="mf4" type="hidden" value="11">
+            </div>
+        </div>
 
         <div class="row">
             {#            <form method="post" class="col-md-4" id="eval-form">#}
@@ -34,34 +62,33 @@
             {#                {% endfor %}#}
             {#                <button class="btn btn-success">Submit</button>#}
             {#            </form>#}
-            <div class="col-md-3">
-                <div class="list-group" id="question-list">
+            <div class="col-md-6 col-md-offset-3">
+                <table class="table" id="question-list">
+                    <thead>
+                    <tr>
+                        <th></th>
+                        {% for mf in section.opts %}
+                            <th class="text-center">{{ mf }}</th>
+                        {% endfor %}
+                    </tr>
+                    </thead>
+                    <tbody>
                     {% for q in questions %}
-                        <a href="#" class="list-group-item">
-                            Question {{ q.number }}
-
-                            <input class="mf1" type="hidden" value="-1">
-                            <input class="mf1" type="hidden" value="0">
-                            <input class="mf1" type="hidden" value="2">
-                            <input class="mf1" type="hidden" value="4">
-                            <input class="mf2" type="hidden" value="1">
-                            <input class="mf2" type="hidden" value="4">
-                            <input class="mf2" type="hidden" value="6">
-                            <input class="mf3" type="hidden" value="3">
-                            <input class="mf3" type="hidden" value="6">
-                            <input class="mf3" type="hidden" value="9">
-                            <input class="mf4" type="hidden" value="7">
-                            <input class="mf4" type="hidden" value="9">
-                            <input class="mf4" type="hidden" value="10">
-                            <input class="mf4" type="hidden" value="11">
-                        </a>
+                        <tr>
+                            <td>
+                                <b>Question {{ q.number }}</b>
+                            </td>
+                            {% for mf in section.opts %}
+                                <td class="text-center">
+                                    <input type="radio" name="{{ q.id }}-difficulty" value="{{ mf }}">
+                                </td>
+                            {% endfor %}
+                        </tr>
                     {% endfor %}
-                </div>
-            </div>
-            <div class="col-md-4 col-md-offset-2">
-                <div id="current-question"></div>
-                <div id="svg-wrapper"></div>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </div>
+    {% endfor %}
+    {#    </div>#}
 {% endblock %}

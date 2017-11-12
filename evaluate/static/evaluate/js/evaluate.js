@@ -1,22 +1,17 @@
 let findNum = /^mf(\d+)$/;
 
 $(function () {
-    let $svgWrapper = $("#svg-wrapper"),
-        $questionList = $('#question-list'),
-        $curQ = $('#current-question'),
-        o = initSvg('#svg-wrapper', $svgWrapper.width(), 300),
-        x = Array.from(new Array(101), (x, i) => i / 10);
-
-
-    $questionList.find('a').click(function () {
-        o.svg.selectAll('*').remove();
+    $('#sections').find('input').each(function() {
+        let section = $(this).val(),
+            svgId = "#svg-" + section,
+            $svgWrapper = $(svgId),
+            o = initSvg(svgId, $svgWrapper.width(), 300),
+            x = Array.from(new Array(101), (x, i) => i / 10);
 
         let circles = [],
             vs = [],
-            $mfs = $(this).find('[class^=mf]'),
+            $mfs = $svgWrapper.parent().find('input'),
             v2 = getVectors($mfs);
-
-        $curQ.text($(this).text());
 
         v2.forEach(vec => {
             let vect = [];
@@ -43,11 +38,7 @@ $(function () {
 
             d3.selectAll('circle').raise();
         });
-
     });
-
-    $questionList.find('a').first().click();
-
 
 });
 

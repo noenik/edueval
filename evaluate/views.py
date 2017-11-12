@@ -28,4 +28,11 @@ def evaluate(request, url_hash):
         init_qs = [{'question': q.id, 'evaluation': None, 'q_num': q.number} for q in exm_qs]
         fs = EvalFormSet(initial=init_qs, queryset=mdls.QuestionEvaluation.objects.none())
 
-    return render(request, 'evaluate/evaluate.html', {'exam': eval_link.exam, 'questions': exm_qs, 'formset': fs})
+    difs = ['Easy', 'Just right', 'Hard', 'Very Hard']
+    compl = ['Not at all', 'Fair', 'Quite', 'Very']
+    sections = [{'name': 'difficulty', 'opts': difs}, {'name': 'complexity', 'opts': compl},
+                {'name': 'importance', 'opts': compl}]
+
+    return render(request, 'evaluate/evaluate.html',
+                  {'exam': eval_link.exam, 'questions': exm_qs, 'formset': fs, 'memberships': difs,
+                   'sections': sections})
