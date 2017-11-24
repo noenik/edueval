@@ -41,7 +41,7 @@ $(function () {
     });
 
 });
-
+/*
 function getVectors($fields) {
     let vect = [];
 
@@ -223,4 +223,4 @@ function drawLineGraph(data, o) {
     //     .call(d3.legend);
 
     return {xDomain: x, yDomain: y}
-}
+}*/

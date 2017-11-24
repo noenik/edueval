@@ -54,6 +54,7 @@ def exam(request, exam_id):
     """
     exm = mdls.Exam.objects.get(pk=exam_id)
     qs = mdls.ExamQuestion.objects.filter(exam=exm).order_by('number')
+    mfs = mdls.MembershipFunction.objects.filter(exam=exm).order_by('mf')
 
     add_qs = request.POST.get('addQs')
     initial = request.POST.get('form-INITIAL_FORMS')
@@ -69,7 +70,18 @@ def exam(request, exam_id):
 
     QuestionModelFormSet = modelformset_factory(mdls.ExamQuestion, fields=('teacher_eval',),
                                                 formset=forms.BaseExamQuestionFormSet, extra=add_qs, can_delete=True)
-    context = {'exam': exm, 'questions': qs}
+
+    if mfs:
+        mfa = [{'eval_type': val, 'membership_functions': [mfp for mfp in mfs if mfp.eval_type == key]}
+               for key, val in mdls.MembershipFunction.EVAL_TYPES]
+
+    else:
+        mfa = [{'eval_type': val,
+                'membership_functions': [{'num': 1, 'mf': [-1, 0, 2, 4]}, {'num': 2, 'mf': [1, 4, 6]}, {'num': 3, 'mf': [3, 6, 9]},
+                                         {'num': 4, 'mf': [7, 9, 10, 11]}]}
+               for key, val in mdls.MembershipFunction.EVAL_TYPES]
+
+    context = {'exam': exm, 'questions': qs, 'mfa': mfa}
 
     if request.POST.get('save_qs'):
         fs = QuestionModelFormSet(request.POST, queryset=qs)

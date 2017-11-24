@@ -34,3 +34,19 @@ class ExamEvaluationLink(models.Model):
     url_hash = models.CharField(max_length=24, unique=True)
     expires = models.DateField(default=datetime.datetime.today() + datetime.timedelta(3))
     exam = models.ForeignKey(Exam)
+
+
+class MembershipFunction(models.Model):
+    EVAL_TYPES = (
+        ('D', 'Difficulty'),
+        ('C', 'Complexity'),
+        ('I', 'Importance'),
+    )
+
+    x1 = models.FloatField()
+    x2 = models.FloatField()
+    x3 = models.FloatField()
+    x4 = models.FloatField(null=True)
+    mf = models.IntegerField()
+    eval_type = models.CharField(max_length=1, choices=EVAL_TYPES)
+    exam = models.ForeignKey(Exam)

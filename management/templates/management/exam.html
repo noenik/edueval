@@ -4,7 +4,7 @@
 
 {% block head %}
     <script type="text/javascript" src="{% static 'management/js/exam.js' %}"></script>
-    <script type="text/javascript" src="{% static 'management/js/mf.js' %}"></script>
+{#    <script type="text/javascript" src="{% static 'management/js/mf.js' %}"></script>#}
 {% endblock %}
 
 {% block content %}
@@ -82,25 +82,35 @@
                         <button name="get_link" class="btn btn-primary" value="1">Get evaluation link!</button>
                     {% endif %}
                 </div>
-                <div class="col-md-3">
-                    <svg width="600" height="300" id="mf">
-
-                    </svg>
-                    <input class="mf1" type="hidden" value="-1">
-                    <input class="mf1" type="hidden" value="0">
-                    <input class="mf1" type="hidden" value="2">
-                    <input class="mf1" type="hidden" value="4">
-                    <input class="mf2" type="hidden" value="1">
-                    <input class="mf2" type="hidden" value="4">
-                    <input class="mf2" type="hidden" value="6">
-                    <input class="mf3" type="hidden" value="3">
-                    <input class="mf3" type="hidden" value="6">
-                    <input class="mf3" type="hidden" value="9">
-                    <input class="mf4" type="hidden" value="7">
-                    <input class="mf4" type="hidden" value="9">
-                    <input class="mf4" type="hidden" value="10">
-                    <input class="mf4" type="hidden" value="11">
+            </div>
+            <div class="row">
+                <div id="sections">
+                    {% for section in mfa %}
+                        <div class="section">
+                            <h3>{{ section.eval_type }}</h3>
+                            <div id="svg-{{ section.eval_type }}" class="svg-wrapper"></div>
+                            {% for mf in section.membership_functions %}
+                                {% for point in mf.mf %}
+                                    <input class="mf{{ mf.num }}" type="hidden" value="{{ point }}">
+                                {% endfor %}
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
                 </div>
+                {#                <input class="mf1" type="hidden" value="-1">#}
+                {#                <input class="mf1" type="hidden" value="0">#}
+                {#                <input class="mf1" type="hidden" value="2">#}
+                {#                <input class="mf1" type="hidden" value="4">#}
+                {#                <input class="mf2" type="hidden" value="1">#}
+                {#                <input class="mf2" type="hidden" value="4">#}
+                {#                <input class="mf2" type="hidden" value="6">#}
+                {#                <input class="mf3" type="hidden" value="3">#}
+                {#                <input class="mf3" type="hidden" value="6">#}
+                {#                <input class="mf3" type="hidden" value="9">#}
+                {#                <input class="mf4" type="hidden" value="7">#}
+                {#                <input class="mf4" type="hidden" value="9">#}
+                {#                <input class="mf4" type="hidden" value="10">#}
+                {#                <input class="mf4" type="hidden" value="11">#}
             </div>
         </form>
     </div>
