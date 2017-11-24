@@ -1,0 +1,15 @@
+Teacher
+Can upload matrix of accuracy and a matrix of time
+
+Student or teacher needs to provite time spent on each question (normalized to the highest)
+
+Inputs Time (matrix or column) Complexity (matrix or column) Memberships - Complexity and Importance (Vector)
+
+Teacher need to provide rule base
+Teacher is provided a default set of memberships, with default labels
+
+Only complexity and importance
+
+Calculate average over all student answers and make a membership from that
+
+Student can give username and candidate number if they want to use the new result
