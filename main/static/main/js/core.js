@@ -1,10 +1,48 @@
-$(function() {
+let findNum = /^mf(\d+)$/;
 
+function drawMfGraphs(wrapper) {
+    wrapper.find('.section').each(function() {
+        let $svgWrapper = $(this).find('.svg-wrapper'),
+            svgId = '#' + $svgWrapper.prop('id'),
+            o = initSvg(svgId, $svgWrapper.width(), 300),
+            x = Array.from(new Array(101), (x, i) => i / 10);
 
+        let circles = [],
+            vs = [],
+            $mfs = $(this).find('[class^=mf]'),
+            v2 = getVectors($mfs);
 
-});
+        v2.forEach(vec => {
+            let vect = [];
+            vec.forEach((val, i) => {
+                let y;
+                if (i === 0 || i === vec.length - 1) {
+                    y = 0;
+                } else
+                    y = 1;
+                circles.push({x: val.v, y: y, field: val.field});
+                vect.push(val.v);
+            });
+            vs.push(vect);
+        });
 
-function getVectors($fields) {
+        drawMf(vs, x, o);
+
+        drawGrabHandles(circles, o);
+
+        $mfs.change(function () {
+            o.svg.selectAll("path").remove();
+            vs = getVectors($mfs).map(a => a.map(b => b.v));
+            drawMf(vs, x, o);
+
+            d3.selectAll('circle').raise();
+        });
+    });
+
+}
+
+function getVectors($fields, valOnly) {
+    if(typeof valOnly === 'undefined') valOnly = false;
     let vect = [];
 
     $fields.each(function () {
@@ -16,7 +54,11 @@ function getVectors($fields) {
             vect[i] = [];
         }
 
-        vect[i].push({v: $(this).val(), field: $(this)});
+        if(valOnly) {
+            vect[i].push($(this).val());
+        } else {
+            vect[i].push({v: $(this).val(), field: $(this)});
+        }
     });
 
     return vect;
@@ -33,7 +75,8 @@ function drawMf(v, x, o) {
         data.push(temp);
     });
 
-    drawLineGraph(data, o);
+    // drawLineGraph(data, o);
+    newTest(data, o);
 }
 
 
@@ -70,7 +113,7 @@ function initSvg(selector, width, height) {
     let svg = d3.select(selector).append('svg')
             .attr('width', width)
             .attr('height', height),
-        margin = {top: 20, right: 20, bottom: 30, left: 50},
+        margin = {top: 10, right: 20, bottom: 30, left: 25},
         w = width - margin.left - margin.right,
         h = height - margin.top - margin.bottom;
 
@@ -95,14 +138,12 @@ function drawGrabHandles(data, o) {
         }));
 
     let x = o.x
-        .domain(d3.extent(data, function (d) {
-            return d.x;
-        }));
+        .domain([0, 10]);
     o.svg.selectAll("circles")
         .data(data)
         .enter().append("circle")
         .attr("cx", function (d) {
-            return x(d.x - 1);
+            return x(d.x);
         })
         .attr("cy", function (d) {
             return y(d.y);
@@ -118,21 +159,20 @@ function drawGrabHandles(data, o) {
             .on("drag", function (d) {
                 let curVal = parseInt(d.field.val()),
                     eventVal = d3.event.x,
-                    newTemp = o.x.invert(eventVal),
-                    newVal = Math.round(newTemp);
+                    newVal = o.x.invert(eventVal);
                 if (newVal !== curVal) {
                     d.field.val(newVal);
                     d.field.change();
                     d3.select(this).attr("cx", d.x = x(newVal));
                 }
 
-            }))
+            }));
 
 }
 
 
 function drawLineGraph(data, o) {
-    let colors = ['#00aa00', '#dddd00', '#ffaa00', '#aa0000'];
+    let colors = ['#00aa00', '#dddd00', '#ffaa00', '#aa0000', '#ff0000'];
     let legend = ['Easy', 'Fair', 'Hard', 'Very Hard'];
 
     let y = o.y
@@ -141,9 +181,7 @@ function drawLineGraph(data, o) {
         }));
 
     let x = o.x
-        .domain(d3.extent(data[0], function (d) {
-            return d.xData;
-        }));
+        .domain([0,10]);
 
     let xAxis = d3.axisBottom()
         .scale(x);
@@ -158,26 +196,42 @@ function drawLineGraph(data, o) {
         .attr("transform", "translate(0," + o.height + ")")
         .call(xAxis);
 
-    data.forEach((dx, i) => {
-        let line = d3.line()
-            .x(function (d, i) {
-                return x(d.xData)
-            })
-            .y(function (d, i) {
-                return y(d.yData)
-            });
+    let line = d3.line()
+        .x(function (d, i) {
+            return x(d.xData)
+        })
+        .y(function (d, i) {
+            return y(d.yData)
+        });
 
-        o.svg.append("path")
-            .data([dx])
-            .style("fill", "none")
-            .style("stroke", colors[i])
-            .style("stroke-width", "2px")
-            .attr("d", line)
-            .attr("data-legend", function () {
-                return legend[i]
-            });
+    let area = d3.area()
+        .x(function(d) { return x(d.xData); })
+        .y0(o.height)
+        .y(function(d) { return y(d.yData); });
 
-    });
+    // data.forEach((dx, i) => {
+
+    // o.svg.selectAll('.line')
+    //     .data(data)
+    //     .enter().append("path")
+    //     .style("fill", "none")
+    //     .style("stroke", function(d, i) { return colors[i] })
+    //     .style("stroke-width", "2px")
+    //     .attr("d", line)
+    //     .attr("data-legend", function (d, i) {
+    //         return legend[i]
+    //     });
+
+    o.svg.selectAll(".area")
+        .data(data)
+        .enter().append('path')
+            .style('fill', function(d, i) { return colors[i] })
+            .style('stroke', function(d, i) { return colors[i] })
+            .style('stroke-width', '2px')
+            .attr("class", "area")
+            .attr("d", area);
+
+    // });
     // o.svg.append("g")
     //     .attr("class", "legend")
     //     .attr("transform", "translate(50,30)")
@@ -185,4 +239,39 @@ function drawLineGraph(data, o) {
     //     .call(d3.legend);
 
     return {xDomain: x, yDomain: y}
+}
+
+function newTest(data, o){
+    let colors = ['#00aa00', '#dddd00', '#ffaa00', '#aa0000', '#ff0000'];
+
+    let x = o.x.domain([0, 10]),
+        y = o.y.domain([0, 1]);
+
+    let area = d3.area()
+        .x(function(d) { return x(d.xData); })
+        .y0(o.height)
+        .y1(function(d) { return y(d.yData); });
+
+
+    o.svg.selectAll(".area")
+        .data(data)
+        .enter().append("path")
+        .style("stroke", function(d, i) { return colors[i] })
+        .style("fill", function(d, i) { return colors[i] })
+        .style("fill-opacity", 0.5)
+        .attr("class", "area")
+        .attr("d", area);
+
+    let xAxis = d3.axisBottom()
+        .scale(x);
+
+    let yAxis = d3.axisLeft()
+        .scale(y);
+
+    o.svg.append("g")
+        .call(yAxis);
+
+    o.svg.append("g")
+        .attr("transform", "translate(0," + o.height + ")")
+        .call(xAxis);
 }

@@ -4,7 +4,7 @@
 
 {% block head %}
     <script type="text/javascript" src="{% static 'management/js/exam.js' %}"></script>
-{#    <script type="text/javascript" src="{% static 'management/js/mf.js' %}"></script>#}
+    {#    <script type="text/javascript" src="{% static 'management/js/mf.js' %}"></script>#}
 {% endblock %}
 
 {% block content %}
@@ -22,8 +22,30 @@
                 </div>
             </div>
         {% endif %}
-        <form method="post">
+        <form method="post" id="mng-form">
             {% csrf_token %}
+            <div class="row">
+                <div class="col-md-3">
+                    {% if url_link %}
+                        <label for="eval-url">Evaluation url:</label>
+                        <div class="input-group">
+                            <input id="eval-url"
+                                   value="{{ request.get_host }}{% url 'eval:evaluate' url_hash=url_link.url_hash %}"
+                                   class="form-control" contentEditable="false">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" title="Copy link to clipboard" id="copy-link-btn">
+                                    <i class="glyphicon glyphicon-copy"></i>
+                                </button>
+                            </span>
+                        </div>
+                    {% else %}
+                        <button name="get_link" class="btn btn-primary" value="1">Get evaluation link!</button>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group"></div>
+
             <div class="row">
                 <div class="col-md-3">
                     <div class="input-group">
@@ -31,8 +53,8 @@
                         <input type="number" id="add-qs" name="addQs" class="form-control"
                                placeholder="Number of questions">
                         <span class="input-group-btn">
-                    <button class="btn btn-success">Add</button>
-                </span>
+                            <button class="btn btn-success">Add</button>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -65,53 +87,31 @@
                     </ul>
                     <button class="btn btn-success" name="save_qs" value="1">Confirm</button>
                 </div>
-                <div class="col-md-3">
-                    {% if url_link %}
-                        <label for="eval-url">Evaluation url:</label>
-                        <div class="input-group">
-                            <input id="eval-url"
-                                   value="{{ request.get_host }}{% url 'eval:evaluate' url_hash=url_link.url_hash %}"
-                                   class="form-control" contentEditable="false">
-                            <span class="input-group-btn">
-                                <button class="btn btn-primary" title="Copy link to clipboard" id="copy-link-btn">
-                                    <i class="glyphicon glyphicon-copy"></i>
-                                </button>
-                            </span>
-                        </div>
-                    {% else %}
-                        <button name="get_link" class="btn btn-primary" value="1">Get evaluation link!</button>
-                    {% endif %}
-                </div>
             </div>
             <div class="row">
-                <div id="sections">
+                <h2>Define default memberships</h2>
+                <div id="sections" class="col-md-8">
                     {% for section in mfa %}
                         <div class="section">
                             <h3>{{ section.eval_type }}</h3>
                             <div id="svg-{{ section.eval_type }}" class="svg-wrapper"></div>
-                            {% for mf in section.membership_functions %}
-                                {% for point in mf.mf %}
-                                    <input class="mf{{ mf.num }}" type="hidden" value="{{ point }}">
+                            <input type="hidden" class="section-type" value="{{ section.eval_type }}">
+                            <div class="form-inline">
+                                {% for mf in section.membership_functions %}
+                                    <input type="text" placeholder="Label for mf {{ mf.num }}"
+                                           class="form-control" name="label-mf{{ mf.num }}" value="{{ mf.label }}">
+                                    {% for point in mf.mf %}
+                                        <input class="mf{{ mf.num }}" type="hidden" value="{{ point }}">
+                                    {% endfor %}
                                 {% endfor %}
-                            {% endfor %}
+                            </div>
                         </div>
                     {% endfor %}
                 </div>
-                {#                <input class="mf1" type="hidden" value="-1">#}
-                {#                <input class="mf1" type="hidden" value="0">#}
-                {#                <input class="mf1" type="hidden" value="2">#}
-                {#                <input class="mf1" type="hidden" value="4">#}
-                {#                <input class="mf2" type="hidden" value="1">#}
-                {#                <input class="mf2" type="hidden" value="4">#}
-                {#                <input class="mf2" type="hidden" value="6">#}
-                {#                <input class="mf3" type="hidden" value="3">#}
-                {#                <input class="mf3" type="hidden" value="6">#}
-                {#                <input class="mf3" type="hidden" value="9">#}
-                {#                <input class="mf4" type="hidden" value="7">#}
-                {#                <input class="mf4" type="hidden" value="9">#}
-                {#                <input class="mf4" type="hidden" value="10">#}
-                {#                <input class="mf4" type="hidden" value="11">#}
             </div>
+            <input id="memberships" type="hidden" name="memberships">
+            <input id="labels" type="hidden" name="labels">
+            <button class="btn btn-success" name="save_ms" id="save-ms-btn">Save Memberships</button>
         </form>
     </div>
 {% endblock %}

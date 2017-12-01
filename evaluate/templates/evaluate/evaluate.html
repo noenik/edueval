@@ -19,76 +19,71 @@
             </h1>
         </div>
     </div>
+
     <div id="sections">
-        {% for section in sections %}
-            <input type="hidden" value="{{ section.name }}">
-        {% endfor %}
-    </div>
-    {% for section in sections %}
-        <div class="row">
-            <div class="col-md-6 col-md-offset-3">
-                <h2>Define {{ section.name }} of questions</h2>
-                <div id="svg-{{ section.name }}"></div>
-
-                <input class="mf1" type="hidden" value="-1">
-                <input class="mf1" type="hidden" value="0">
-                <input class="mf1" type="hidden" value="2">
-                <input class="mf1" type="hidden" value="4">
-                <input class="mf2" type="hidden" value="1">
-                <input class="mf2" type="hidden" value="4">
-                <input class="mf2" type="hidden" value="6">
-                <input class="mf3" type="hidden" value="3">
-                <input class="mf3" type="hidden" value="6">
-                <input class="mf3" type="hidden" value="9">
-                <input class="mf4" type="hidden" value="7">
-                <input class="mf4" type="hidden" value="9">
-                <input class="mf4" type="hidden" value="10">
-                <input class="mf4" type="hidden" value="11">
-            </div>
-        </div>
-
-        <div class="row">
-            {#            <form method="post" class="col-md-4" id="eval-form">#}
-            {#                {% csrf_token %}#}
-            {#                {{ formset.management_form }}#}
-            {#                {% for ef in formset %}#}
-            {#                    <div class="question-eval-wrapper">#}
-            {#                        <b>Question <span class="question_num">{{ ef.q_num.value }}:</span></b>#}
-            {#                        <label for="{{ ef.evaluation.name }}" class="sr-only">{{ ef.evaluation.label }}</label>#}
-            {#                        {% for field in ef %}#}
-            {#                            {{ field }}#}
-            {#                        {% endfor %}#}
-            {#                    </div>#}
-            {#                {% endfor %}#}
-            {#                <button class="btn btn-success">Submit</button>#}
-            {#            </form>#}
-            <div class="col-md-6 col-md-offset-3">
-                <table class="table" id="question-list">
-                    <thead>
-                    <tr>
-                        <th></th>
-                        {% for mf in section.opts %}
-                            <th class="text-center">{{ mf }}</th>
-                        {% endfor %}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for q in questions %}
-                        <tr>
-                            <td>
-                                <b>Question {{ q.number }}</b>
-                            </td>
-                            {% for mf in section.opts %}
-                                <td class="text-center">
-                                    <input type="radio" name="{{ q.id }}-difficulty" value="{{ mf }}">
-                                </td>
+        <form method="post">
+            {% csrf_token %}
+            {% for section in sections %}
+                <div class="row">
+                    <div class="col-md-6 col-md-offset-3">
+                        <div class="section">
+                            <h3>Define {{ section.eval_type }} of questions</h3>
+                            <div id="svg-{{ section.eval_type }}" class="svg-wrapper"></div>
+                            <input type="hidden" class="section-type" value="{{ section.eval_type }}">
+                            {% for mf in section.membership_functions %}
+                                {% for point in mf.mf %}
+                                    <input class="mf{{ mf.num }}" type="hidden" value="{{ point }}">
+                                {% endfor %}
                             {% endfor %}
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    {#            <form method="post" class="col-md-4" id="eval-form">#}
+                    {#                {% csrf_token %}#}
+                    {#                {{ formset.management_form }}#}
+                    {#                {% for ef in formset %}#}
+                    {#                    <div class="question-eval-wrapper">#}
+                    {#                        <b>Question <span class="question_num">{{ ef.q_num.value }}:</span></b>#}
+                    {#                        <label for="{{ ef.evaluation.name }}" class="sr-only">{{ ef.evaluation.label }}</label>#}
+                    {#                        {% for field in ef %}#}
+                    {#                            {{ field }}#}
+                    {#                        {% endfor %}#}
+                    {#                    </div>#}
+                    {#                {% endfor %}#}
+                    {#                <button class="btn btn-success">Submit</button>#}
+                    {#            </form>#}
+                    <div class="col-md-6 col-md-offset-3">
+                        <table class="table" id="question-list">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                {% for i in section.membership_functions %}
+                                    <th class="text-center">{{ i.label }}</th>
+                                {% endfor %}
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for q in questions %}
+                                <tr>
+                                    <td>
+                                        <b>Question {{ q.number }}</b>
+                                    </td>
+                                    {% for i in section.membership_functions %}
+                                        <td class="text-center">
+                                            <input type="radio" name="{{ q.id }}-{{ section.eval_type }}" value="{{ i.num }}">
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        <button class="btn btn-success">Submit</button>
+        </form>
+    </div>
     {#    </div>#}
 {% endblock %}

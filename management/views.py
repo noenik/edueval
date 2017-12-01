@@ -1,5 +1,6 @@
 import random
 import string
+import json
 
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
@@ -54,7 +55,7 @@ def exam(request, exam_id):
     """
     exm = mdls.Exam.objects.get(pk=exam_id)
     qs = mdls.ExamQuestion.objects.filter(exam=exm).order_by('number')
-    mfs = mdls.MembershipFunction.objects.filter(exam=exm).order_by('mf')
+    mfs = mdls.MembershipFunction.objects.filter(exam=exm).order_by('eval_type')
 
     add_qs = request.POST.get('addQs')
     initial = request.POST.get('form-INITIAL_FORMS')
@@ -71,14 +72,20 @@ def exam(request, exam_id):
     QuestionModelFormSet = modelformset_factory(mdls.ExamQuestion, fields=('teacher_eval',),
                                                 formset=forms.BaseExamQuestionFormSet, extra=add_qs, can_delete=True)
 
-    if mfs:
-        mfa = [{'eval_type': val, 'membership_functions': [mfp for mfp in mfs if mfp.eval_type == key]}
-               for key, val in mdls.MembershipFunction.EVAL_TYPES]
+    mss = request.POST.get('memberships')
+    labels = request.POST.get('labels')
+    if mss and labels:
+        labels = json.loads(labels)
+        memberships = json.loads(mss)
+        change_or_new(memberships, labels, mfs, exm)
 
+    if mfs:
+        mfa = [{'eval_type': mf.get_eval_type_display(), 'membership_functions': mf.as_dicts()} for mf in mfs]
     else:
         mfa = [{'eval_type': val,
-                'membership_functions': [{'num': 1, 'mf': [-1, 0, 2, 4]}, {'num': 2, 'mf': [1, 4, 6]}, {'num': 3, 'mf': [3, 6, 9]},
-                                         {'num': 4, 'mf': [7, 9, 10, 11]}]}
+                'membership_functions': [{'num': 1, 'mf': [-1, 0, 1, 3]}, {'num': 2, 'mf': [1, 3, 5]},
+                                         {'num': 3, 'mf': [3, 5, 7]},
+                                         {'num': 4, 'mf': [5, 7, 9]}, {'num': 5, 'mf': [7, 9, 10, 11]}]}
                for key, val in mdls.MembershipFunction.EVAL_TYPES]
 
     context = {'exam': exm, 'questions': qs, 'mfa': mfa}
@@ -107,6 +114,24 @@ def exam(request, exam_id):
             context['url_link'] = generate_link(exm)
 
     return render(request, 'management/exam.html', context)
+
+
+def svg_test(request):
+    return render(request, 'management/test.html')
+
+
+def change_or_new(ms, ls, qs, exam):
+    for c, et in mdls.MembershipFunction.EVAL_TYPES:
+        change = False
+        for q in qs:
+            if q.get_eval_type_display() == et:
+                q.mf = str(ms[et]).replace("'", '"')
+                q.labels = str(ls[et]).replace("'", '"')
+                q.save()
+                change = True
+
+        if not change:
+            mdls.MembershipFunction(eval_type=c, mf=ms[et], labels=ls[et], exam=exam).save()
 
 
 def generate_link(exm, exp=None):

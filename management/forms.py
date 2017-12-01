@@ -49,3 +49,15 @@ class BaseExamQuestionFormSet(forms.BaseModelFormSet):
         super(BaseExamQuestionFormSet, self).__init__(*args, **kwargs)
         self.form = ExamQuestionForm
 
+
+# class MembershipForm(forms.ModelForm):
+#     class Meta:
+#         model = models.MembershipFunction
+#         fields = ['x1', 'x2', 'x3', 'x4', 'eval_type', 'mf']
+#         widgets = {f: forms.HiddenInput() for f in fields}
+#
+#
+# class BaseMembershipFormSet(forms.BaseModelFormSet):
+#     def __init__(self, *args, **kwargs):
+#         super(BaseMembershipFormSet, self).__init__(*args, **kwargs)
+#         self.form = MembershipForm

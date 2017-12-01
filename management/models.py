@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
 import datetime
+import json
+
+
+def get_date():
+    return datetime.datetime.today() + datetime.timedelta(days=3)
 
 
 class Course(models.Model):
@@ -32,21 +37,26 @@ class ExamEvaluationLink(models.Model):
     Valid for 3 days by default
     """
     url_hash = models.CharField(max_length=24, unique=True)
-    expires = models.DateField(default=datetime.datetime.today() + datetime.timedelta(3))
+    expires = models.DateField(default=get_date)
     exam = models.ForeignKey(Exam)
 
 
 class MembershipFunction(models.Model):
+    EMAP = {'Complexity': 'C', 'Importance': 'I'}
     EVAL_TYPES = (
-        ('D', 'Difficulty'),
         ('C', 'Complexity'),
         ('I', 'Importance'),
     )
-
-    x1 = models.FloatField()
-    x2 = models.FloatField()
-    x3 = models.FloatField()
-    x4 = models.FloatField(null=True)
-    mf = models.IntegerField()
+    mf = models.CharField(max_length=150)
+    labels = models.CharField(max_length=150, null=True)
     eval_type = models.CharField(max_length=1, choices=EVAL_TYPES)
     exam = models.ForeignKey(Exam)
+
+    def as_dicts(self):
+        lst = json.loads(self.mf)
+        if self.labels:
+            labels = json.loads(self.labels)
+        else:
+            labels = ['']*len(lst)
+        return [{'num': num, 'mf': mf, 'label': l} for num, mf, l in zip(range(1, len(lst)+1), lst, labels)]
+

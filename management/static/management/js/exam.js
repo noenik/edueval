@@ -1,14 +1,9 @@
-let findNum = /^mf(\d+)$/;
-
 $(function() {
 
-    let $q_form = $('#q_form');
+    let $q_form = $('#q_form'),
+        $sections = $('#sections');
 
-    $q_form.find('ul').sortable({
-        stop: function() {
-            console.log("foo");
-        }
-    });
+    $q_form.find('ul').sortable();
 
     let cur_num = 0;
     $q_form.find('.q_form_wrapper').each(function() {
@@ -48,42 +43,31 @@ $(function() {
        $delete_field.prop('checked', true);
     });
 
-    $('#sections').find('.section').each(function() {
-        let $svgWrapper = $(this).find('.svg-wrapper'),
-            svgId = '#' + $svgWrapper.prop('id'),
-            o = initSvg(svgId, $svgWrapper.width(), 300),
-            x = Array.from(new Array(101), (x, i) => i / 10);
-        console.log(svgId);
-        let circles = [],
-            vs = [],
-            $mfs = $(this).find('input'),
-            v2 = getVectors($mfs);
+    drawMfGraphs($sections);
 
-        v2.forEach(vec => {
-            let vect = [];
-            vec.forEach((val, i) => {
-                let y;
-                if (i === 0 || i === vec.length - 1) {
-                    y = 0;
-                } else
-                    y = 1;
-                circles.push({x: val.v, y: y, field: val.field});
-                vect.push(val.v);
+    $('#save-ms-btn').click(function (e) {
+        e.preventDefault();
+
+        let data = {},
+            labels = {},
+            $mem = $('#memberships');
+
+        $sections.find('.section').each(function () {
+            let section = $(this).find('.section-type').val();
+
+            data[section] = getVectors($(this).find('[class^=mf]'), true);
+
+            let theLabels = [];
+            $(this).find('[name^=label-mf]').each(function () {
+                theLabels.push($(this).val());
             });
-            vs.push(vect);
+
+            labels[section] = theLabels
         });
 
-        drawMf(vs, x, o);
-
-        drawGrabHandles(circles, o);
-
-        $mfs.change(function () {
-            o.svg.selectAll("path").remove();
-            vs = getVectors($mfs).map(a => a.map(b => b.v));
-            drawMf(vs, x, o);
-
-            d3.selectAll('circle').raise();
-        });
-    });
+        $mem.val(JSON.stringify(data));
+        $('#labels').val(JSON.stringify(labels));
+        $('#mng-form').submit();
+    })
 
 });
