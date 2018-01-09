@@ -1,0 +1,210 @@
+{% extends 'main_template.html' %}
+{% load static %}
+{% block title %}Manage Exam{% endblock %}
+{% block head %}
+    <script type="text/javascript" src="{% static 'management/js/manage.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="col-md-8 col-md-offset-2">
+        <div class="page-header">
+            <h1>{{ exam.name }}</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <b>{{ exam.name }}</b> for {{ exam.course.code }}
+                        (<a href="{% url 'manage:exam_change' exam_id=exam.id %}">Change?</a>)
+                    </li>
+                    <li class="list-group-item">
+                        Number of questions: {{ num_qs }}
+                    </li>
+                    <li class="list-group-item">
+                        Number of evaluations: {{ evals }}
+                    </li>
+                </ul>
+            </div>
+
+            <div class="col-md-12">
+                <h2>Current weights:</h2>
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        {% for q in questions %}
+                            <th>Question {{ q.number }}</th>
+                        {% endfor %}
+                        <th>Sum</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        {% for q in questions %}
+                            <td>{{ q.teacher_eval }}</td>
+                        {% endfor %}
+                        <td>{{ qs_sum }}</td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                {% if old_grades %}
+                    <h3></h3>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            {% for q in new_weights %}
+                                <th>
+                                    Question {{ q.number }}
+                                </th>
+                            {% endfor %}
+                            <th> Sum</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for s in old_grades %}
+                            <tr>
+                                {% for g in s %}
+                                    <td>
+                                        {{ g }}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                <h2>Re-evaluated weights</h2>
+                {% if new_weights %}
+                    <form method="post" id="acc-upload-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                {% for q in new_weights %}
+                                    <th>Question {{ q.number }}</th>
+                                {% endfor %}
+                                <th>Sum</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                {% for q in new_weights %}
+                                    <td>
+                                        {{ q.re_eval }}
+                                        <input type="hidden" value="{{ q.re_eval }}" name="new_weights">
+                                    </td>
+                                {% endfor %}
+                                <td>{{ new_weights_sum }}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        {% if new_grades %}
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    {% for q in new_weights %}
+                                        <th>
+                                            Question {{ q.number }}
+                                        </th>
+                                    {% endfor %}
+                                    <th> Sum</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for s in new_grades %}
+                                    <tr>
+                                        {% for g in s %}
+                                            <td>
+                                                {{ g }}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+
+                        <label class="btn btn-default">
+                            Upload Accuracy Matrix
+                            <input type="file" style="display: none;" name="accuracy-matrix" id="acc-upload">
+                        </label>
+                    </form>
+                {% endif %}
+
+                {% if request.POST.upload_data %}
+                    <div id="sections">
+                        {% for section in sections %}
+                            <div class="row">
+                                <div class="col-md-8 col-md-offset-2">
+                                    <div class="section">
+                                        <h3>Define {{ section.eval_type }} of questions</h3>
+                                        <div id="svg-{{ section.eval_type }}" class="svg-wrapper"></div>
+                                        <input type="hidden" class="section-type" value="{{ section.eval_type }}">
+                                        {% for mf in section.membership_functions %}
+                                            {% for point in mf.mf %}
+                                                <input class="mf{{ mf.num }}" type="hidden" value="{{ point }}">
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-8 col-md-offset-2">
+                                    <table class="table question-list">
+                                        <thead>
+                                        <tr>
+                                            <th></th>
+                                            {% for i in section.membership_functions %}
+                                                <th class="text-center">{{ i.label }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for q in questions %}
+                                            <tr>
+                                                <td>
+                                                    <b>Question {{ q.number }}</b>
+                                                </td>
+                                                <td class="slider-container" colspan="5">
+                                                    <input name="{{ q.number }}-{{ section.eval_type }}" type="range"
+                                                           min="0" max="1" step="0.01">
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <div class="row">
+                            <div class="col-md-8 col-md-offset-2">
+                                <form method="post" id="data-by-teacher" enctype="multipart/form-data"
+                                      class="pull-right">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="data" id="data">
+                                    <label for="time-matrix-upload" class="btn btn-default">
+                                        Upload Time Matrix
+                                        <input type="file" id="time-matrix-upload" name="time-matrix"
+                                               style="display: none;">
+                                    </label>
+                                    <button class="btn btn-success">Submit</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                {% endif %}
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button name="calc_eval" value="1" class="btn btn-primary">Calculate Student Evaluations</button>
+                    <button name="upload_data" value="1" class="btn btn-primary">Provide data</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

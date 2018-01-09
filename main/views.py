@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 def index(request):
     data = {}
-    if not request.user.is_authenticated():
+    if not request.user.is_authenticated:
         data['loginform'] = LoginForm(request.POST or None)
     return render(request, 'main/index.html', data)
 

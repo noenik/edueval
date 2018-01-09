@@ -72,8 +72,17 @@
                                 Select exam to see and edit details:
                                 <div class="list-group">
                                     {% for exam in exams %}
-                                        <a class="list-group-item"
-                                           href="{% url 'manage:exam' exam_id=exam.id %}">{{ exam.name }}</a>
+                                        <div class="list-group-item">
+                                            {{ exam.name }}
+                                        <span class="controls">
+                                            <a href="{% url 'manage:exam_change' exam_id=exam.id %}">
+                                                <i class="glyphicon glyphicon-edit"></i>
+                                            </a>
+                                            <a href="{% url 'manage:exam_manage' exam_id=exam.id %}">
+                                                <i class="glyphicon glyphicon-signal"></i>
+                                            </a>
+                                        </span>
+                                        </div>
                                     {% endfor %}
                                 </div>
                             {% else %}

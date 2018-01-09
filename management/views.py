@@ -1,10 +1,16 @@
+import csv
 import random
 import string
 import json
+import numpy as np
+from functools import reduce
 
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from Stud_Eval import test
+from evaluate.models import ExamEvaluation
+from MembershipFunction import mf
 import management.forms as forms
 import management.models as mdls
 import management.slugger as slugify
@@ -46,7 +52,7 @@ def mng_home(request, course=None):
 
 
 @login_required
-def exam(request, exam_id):
+def exam_change(request, exam_id):
     """
     View for a detailed page for an exam
     :param request:
@@ -78,14 +84,15 @@ def exam(request, exam_id):
         labels = json.loads(labels)
         memberships = json.loads(mss)
         change_or_new(memberships, labels, mfs, exm)
+        return redirect('manage:exam_change', exam_id=exam_id)
 
     if mfs:
         mfa = [{'eval_type': mf.get_eval_type_display(), 'membership_functions': mf.as_dicts()} for mf in mfs]
     else:
         mfa = [{'eval_type': val,
-                'membership_functions': [{'num': 1, 'mf': [-1, 0, 1, 3]}, {'num': 2, 'mf': [1, 3, 5]},
-                                         {'num': 3, 'mf': [3, 5, 7]},
-                                         {'num': 4, 'mf': [5, 7, 9]}, {'num': 5, 'mf': [7, 9, 10, 11]}]}
+                'membership_functions': [{'num': 1, 'mf': [-0.1, 0.0, 0.1, 0.3]}, {'num': 2, 'mf': [0.1, 0.3, 0.5]},
+                                         {'num': 3, 'mf': [0.3, 0.5, 0.7]},
+                                         {'num': 4, 'mf': [0.5, 0.7, 0.9]}, {'num': 5, 'mf': [0.7, 0.9, 1.0, 1.1]}]}
                for key, val in mdls.MembershipFunction.EVAL_TYPES]
 
     context = {'exam': exm, 'questions': qs, 'mfa': mfa}
@@ -113,7 +120,68 @@ def exam(request, exam_id):
         else:
             context['url_link'] = generate_link(exm)
 
-    return render(request, 'management/exam.html', context)
+    return render(request, 'management/change_exam.html', context)
+
+
+def exam_manage(request, exam_id):
+    exm = mdls.Exam.objects.get(pk=exam_id)
+    qs = mdls.ExamQuestion.objects.filter(exam=exm).order_by('number')
+    evals = ExamEvaluation.objects.filter(exam=exm)
+    res = None
+
+    context = {'exam': exm, 'evals': len(evals), 'num_qs': len(qs), 'questions': qs,
+               'qs_sum': sum([q.teacher_eval for q in qs])}
+
+    if request.POST.get('calc_eval'):
+        res = gather_evaluation_results(exam_id)
+
+    if request.POST.get('upload_data'):
+        mfs = mdls.MembershipFunction.objects.filter(exam=exm).order_by('eval_type')
+        context['sections'] = [{'eval_type': mf.get_eval_type_display(), 'membership_functions': mf.as_dicts()} for mf
+                               in mfs]
+
+    if request.POST.get('data'):
+        data = json.loads(request.POST.get('data'))
+        file = request.FILES.get('time-matrix')
+        data['time'] = [[float(e) for e in line] for line in csv.reader(decode_utf8(file))]
+        data['current_weights'] = [q.teacher_eval for q in qs]
+        # print(data)
+        res = calculate_evaluation_results(data)
+
+    if res:
+        new_weights = [{'number': i, 're_eval': v[0]} for i, v in zip(range(1, len(res) + 1), res)]
+        context['new_weights'] = new_weights
+        context['new_weights_sum'] = sum([i['re_eval'] for i in new_weights])
+
+    if request.POST.get('new_weights'):
+        nw = [float(e) for e in request.POST.getlist('new_weights')]
+        file = request.FILES.get('accuracy-matrix')
+        accuracy = [[float(e) for e in line] for line in csv.reader(decode_utf8(file))]
+        weights = [q.teacher_eval for q in qs]
+        grades = []
+        new_grades = []
+
+        for l in accuracy:
+            old_grade, new_grade = zip(*[(ow*a, nw*a) for ow, nw, a in zip(weights, nw, l)])
+            old_grade = list(old_grade)
+            new_grade = list(new_grade)
+            new_grade.append(sum(new_grade))
+            old_grade.append(sum(old_grade))
+            new_grades.append(new_grade)
+            grades.append(old_grade)
+
+        context["new_weights"] = [{'number': i, 're_eval': w} for i, w in zip(range(1, len(nw)+1), nw)]
+        context["new_weights_sum"] = sum(nw)
+        context["new_grades"] = new_grades
+        context["old_grades"] = grades
+
+    return render(request, 'management/manage_exam.html', context)
+
+
+def decode_utf8(it):
+    """ Decode a file in memory with utf-8 """
+    for l in it:
+        yield l.decode('utf-8')
 
 
 def svg_test(request):
@@ -121,17 +189,27 @@ def svg_test(request):
 
 
 def change_or_new(ms, ls, qs, exam):
+    """
+    Edit an existing MembershipFunction object or create new if it does not exist
+    :param ms:
+    :param ls:
+    :param qs:
+    :param exam:
+    :return:
+    """
     for c, et in mdls.MembershipFunction.EVAL_TYPES:
         change = False
+        mf = str(ms[et]).replace("'", '"')
+        labels = str(ls[et]).replace("'", '"')
         for q in qs:
             if q.get_eval_type_display() == et:
-                q.mf = str(ms[et]).replace("'", '"')
-                q.labels = str(ls[et]).replace("'", '"')
+                q.mf = mf
+                q.labels = labels
                 q.save()
                 change = True
 
         if not change:
-            mdls.MembershipFunction(eval_type=c, mf=ms[et], labels=ls[et], exam=exam).save()
+            mdls.MembershipFunction(eval_type=c, mf=mf, labels=labels, exam=exam).save()
 
 
 def generate_link(exm, exp=None):
@@ -152,3 +230,80 @@ def generate_link(exm, exp=None):
     el.save()
 
     return el
+
+
+def calculate_evaluation_results(data):
+    c = get_membership_degrees(data['qs']['Complexity'], data['mfs']['Complexity'])
+    i = get_membership_degrees(data['qs']['Importance'], data['mfs']['Importance'])
+    t = normalize_time(data['time'])
+    g = data['current_weights']
+
+    return test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g)
+
+
+def gather_evaluation_results(exam_id):
+    """
+    Collect all evaluations of a given exam and send it to the matlab script
+    :param exam_id: The exam id (pk)
+    :return: List of new weights for each question
+    """
+    exam = mdls.Exam.objects.get(pk=exam_id)
+    evals = ExamEvaluation.objects.filter(exam=exam)
+    qs = mdls.ExamQuestion.objects.filter(exam=exam).order_by('number')
+    g = [q.teacher_eval for q in qs]
+    c = []
+    i = []
+    t = []
+
+    for e in evals:
+        cur_eval = e.get_evaluation()
+        cur_mfs = e.get_mf()
+        c.append(get_membership_degrees(cur_eval['Complexity'], cur_mfs['Complexity']))
+        i.append(get_membership_degrees(cur_eval['Importance'], cur_mfs['Importance']))
+        t.append(e.get_time())
+
+    c = calc_mean(c)
+    i = calc_mean(i)
+    t = normalize_time(t)
+
+    # print("Complexity:\n", c, "\nImportance:\n", i, "\nTime:\n", t)
+    # print("Original weights:", g)
+    # print("New weights", test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g))
+    return test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g)
+
+
+def get_membership_degrees(crisp_set, mfs):
+    """
+    Calculate set of crisp values to a set of membership degrees
+    :param crisp_set: Set of crisp values from which to make membership degrees
+    :param mfs: Membership functions
+    :return: Matrix (2D-array) of membership degrees
+    """
+    return np.array([[mf(x, cmf) for cmf in mfs] for x in crisp_set])
+
+
+def calc_mean(mat_list):
+    """
+    Calculate the mean values (element wise) for a set of matrices
+    :param mat_list: List of matrices from which to calculate a mean matrix
+    :return: Matrix of mean values
+    """
+    num_eval = len(mat_list)
+    added = reduce(lambda a, b: a + b, mat_list)
+    return added / num_eval
+
+
+def normalize_time(time_list):
+    """
+    Normalize a matrix of time values wrt largest time value for each question
+    :param time_list: List of time values provided by student
+    :return: Normalized matrix of time values
+    """
+    time = np.array(time_list)
+    normalized = time / time.max(axis=0)
+
+    return np.transpose(normalized)
+
+#
+# def calc_mean_mfs():
+#

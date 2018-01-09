@@ -13,13 +13,13 @@ class Course(models.Model):
     code = models.CharField(max_length=10, unique=True)
     slug = models.CharField(max_length=10)
     description = models.CharField(max_length=200, null=True)
-    owner = models.ForeignKey(User)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
 class Exam(models.Model):
     """ Model for exams beloging to a given course """
     name = models.CharField(max_length=75)
-    course = models.ForeignKey(Course)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
 
 class ExamQuestion(models.Model):
@@ -27,7 +27,7 @@ class ExamQuestion(models.Model):
     question = models.TextField(null=True)
     number = models.IntegerField()
     teacher_eval = models.IntegerField()
-    exam = models.ForeignKey(Exam)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
 
 
 class ExamEvaluationLink(models.Model):
@@ -38,7 +38,7 @@ class ExamEvaluationLink(models.Model):
     """
     url_hash = models.CharField(max_length=24, unique=True)
     expires = models.DateField(default=get_date)
-    exam = models.ForeignKey(Exam)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
 
 
 class MembershipFunction(models.Model):
@@ -50,7 +50,7 @@ class MembershipFunction(models.Model):
     mf = models.CharField(max_length=150)
     labels = models.CharField(max_length=150, null=True)
     eval_type = models.CharField(max_length=1, choices=EVAL_TYPES)
-    exam = models.ForeignKey(Exam)
+    exam = models.ForeignKey(Exam, on_delete=models.CASCADE)
 
     def as_dicts(self):
         lst = json.loads(self.mf)

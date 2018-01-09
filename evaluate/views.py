@@ -1,10 +1,9 @@
 from django.shortcuts import render
 from management.models import ExamQuestion, ExamEvaluationLink, MembershipFunction
-from django.forms import modelformset_factory
-import evaluate.forms as forms
 import evaluate.models as mdls
 import datetime
 import re
+import json
 
 
 def evaluate(request, url_hash):
@@ -17,23 +16,30 @@ def evaluate(request, url_hash):
     exm_qs = ExamQuestion.objects.filter(exam=eval_link.exam).order_by('number')
     mfs = MembershipFunction.objects.filter(exam=eval_link.exam).order_by('eval_type')
 
-    EvalFormSet = modelformset_factory(mdls.QuestionEvaluation, fields=('evaluation',), formset=forms.BaseEvalFormSet,
-                                       extra=len(exm_qs))
-
     if request.POST:
-        # fs = EvalFormSet(request.POST, queryset=mdls.QuestionEvaluation.objects.none())
-        # if fs.is_valid():
-        #     for form in fs:
-        #         if form.is_valid():
-        #             form.save()
+        time_rating = []
+        eval_rating = {'Complexity': [], 'Importance': []}
         for key, val in request.POST.items():
             m = re.match(r'^(\d+)-(Complexity|Importance)$', key)
             if m:
-                print("Match! Question", m.groups()[0], "on", m.groups()[1], "is", val)
+                # print("Match! Question", m.groups()[0], "on", m.groups()[1], "is", val)
+                eval_rating[m.groups()[1]].append(float(val))
+            else:
+                time = re.match(r'^(\d+)-time$', key)
+                if time:
+                    # print("Time rating on q", time.groups()[0], val)
+                    time_rating.append(float(val))
 
-    else:
-        init_qs = [{'question': q.id, 'evaluation': None, 'q_num': q.number} for q in exm_qs]
-        fs = EvalFormSet(initial=init_qs, queryset=mdls.QuestionEvaluation.objects.none())
+        new_mfs = request.POST.get('mfs')
+
+        new_eval = mdls.ExamEvaluation(
+            evaluation=json.dumps(eval_rating),
+            time=json.dumps(time_rating),
+            membershipfunction=new_mfs,
+            exam=eval_link.exam
+        )
+
+        new_eval.save()
 
     compl = ['Not at all', 'Fair', 'Quite', 'Very']
 

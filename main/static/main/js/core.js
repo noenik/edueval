@@ -5,7 +5,7 @@ function drawMfGraphs(wrapper) {
         let $svgWrapper = $(this).find('.svg-wrapper'),
             svgId = '#' + $svgWrapper.prop('id'),
             o = initSvg(svgId, $svgWrapper.width(), 300),
-            x = Array.from(new Array(101), (x, i) => i / 10);
+            x = Array.from(new Array(101), (x, i) => i / 100);
 
         let circles = [],
             vs = [],
@@ -48,16 +48,17 @@ function getVectors($fields, valOnly) {
     $fields.each(function () {
         let eleClass = $(this).prop('class');
         let num = parseInt(findNum.exec(eleClass)[1]),
-            i = num - 1;
+            i = num - 1,
+            val = parseFloat($(this).val());
 
         if (typeof vect[i] === 'undefined') {
             vect[i] = [];
         }
 
         if(valOnly) {
-            vect[i].push($(this).val());
+            vect[i].push(val);
         } else {
-            vect[i].push({v: $(this).val(), field: $(this)});
+            vect[i].push({v: val, field: $(this)});
         }
     });
 
@@ -138,7 +139,7 @@ function drawGrabHandles(data, o) {
         }));
 
     let x = o.x
-        .domain([0, 10]);
+        .domain([0, 1]);
     o.svg.selectAll("circles")
         .data(data)
         .enter().append("circle")
@@ -244,7 +245,7 @@ function drawLineGraph(data, o) {
 function newTest(data, o){
     let colors = ['#00aa00', '#dddd00', '#ffaa00', '#aa0000', '#ff0000'];
 
-    let x = o.x.domain([0, 10]),
+    let x = o.x.domain([0, 1]),
         y = o.y.domain([0, 1]);
 
     let area = d3.area()
