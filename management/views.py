@@ -149,7 +149,7 @@ def exam_manage(request, exam_id):
         res = calculate_evaluation_results(data)
 
     if res:
-        new_weights = [{'number': i, 're_eval': v[0]} for i, v in zip(range(1, len(res) + 1), res)]
+        new_weights = [{'number': i, 're_eval': v} for i, v in zip(range(1, len(res) + 1), res)]
         context['new_weights'] = new_weights
         context['new_weights_sum'] = sum([i['re_eval'] for i in new_weights])
 
@@ -258,18 +258,21 @@ def gather_evaluation_results(exam_id):
     for e in evals:
         cur_eval = e.get_evaluation()
         cur_mfs = e.get_mf()
-        c.append(get_membership_degrees(cur_eval['Complexity'], cur_mfs['Complexity']))
-        i.append(get_membership_degrees(cur_eval['Importance'], cur_mfs['Importance']))
+        c.append(cur_eval['Complexity'])  # get_membership_degrees(cur_eval['Complexity'], cur_mfs['Complexity']))
+        i.append(cur_eval['Importance'])  # get_membership_degrees(cur_eval['Importance'], cur_mfs['Importance']))
         t.append(e.get_time())
 
-    c = calc_mean(c)
-    i = calc_mean(i)
+    c = calc_mean(np.array(c))
+    i = calc_mean(np.array(i))
     t = normalize_time(t)
+
+    rbs = test.compile_rulebases({'Complexity': [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]],
+                                  'Importance': [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]]})
 
     # print("Complexity:\n", c, "\nImportance:\n", i, "\nTime:\n", t)
     # print("Original weights:", g)
     # print("New weights", test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g))
-    return test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g)
+    return test.evaluate(t, c, i, rbs)  # test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g)
 
 
 def get_membership_degrees(crisp_set, mfs):
