@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8 offset-md-2">
         <div class="page-header">
             <h1>
                 Evaluation of {{ exam.name }}
@@ -25,7 +25,7 @@
             {% csrf_token %}
             {% for section in sections %}
                 <div class="row">
-                    <div class="col-md-6 col-md-offset-3">
+                    <div class="col-md-6 offset-md-3">
                         <div class="section">
                             <h3>Define {{ section.eval_type }} of questions</h3>
                             <div id="svg-{{ section.eval_type }}" class="svg-wrapper"></div>
@@ -40,7 +40,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6 col-md-offset-3">
+                    <div class="col-md-6 offset-md-3">
                         <table class="table" id="question-list">
                             <thead>
                             <tr>
@@ -63,7 +63,7 @@
 {#                                        </td>#}
 {#                                    {% endfor %}#}
                                 <td class="slider-container" colspan="5">
-                                    <input name="{{ q.number }}-{{ section.eval_type }}" type="range" min="0" max="1" step="0.01">
+                                    <input name="{{ q.number }}-{{ section.eval_type }}" type="range" min="0" max="1" step="0.01" class="w-100">
                                 </td>
                                 </tr>
                             {% endfor %}
@@ -74,7 +74,7 @@
             {% endfor %}
         </div>
         <div class="row">
-            <div class="col-md-6 col-md-offset-3">
+            <div class="col-md-6 offset-md-3">
                 <h3>Time spent on each question</h3>
                 <ul class="list-group">
                     {% for q in questions %}
@@ -87,7 +87,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6 col-md-offset-3">
+            <div class="col-md-6 offset-md-3">
                 <button class="btn btn-success" id="eval-submit">Submit</button>
             </div>
         </div>

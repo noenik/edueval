@@ -1,5 +1,14 @@
 let findNum = /^mf(\d+)$/;
 
+$(function() {
+
+    $('.disabled').click(function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+});
+
 function drawMfGraphs(wrapper) {
     wrapper.find('.section').each(function() {
         let $svgWrapper = $(this).find('.svg-wrapper'),

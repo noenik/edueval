@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8 offset-md-2">
         <div class="page-header">
             <h1>{{ exam.name }}</h1>
         </div>
@@ -27,7 +27,7 @@
                 </ul>
             </div>
 
-            <div class="col-md-12">
+            <div class="col-md-12 mt-5">
                 <h2>Current weights:</h2>
                 <table class="table table-bordered">
                     <thead>
@@ -41,7 +41,7 @@
                     <tbody>
                     <tr>
                         {% for q in questions %}
-                            <td>{{ q.teacher_eval }}</td>
+                            <td>{{ q.teacher_eval|floatformat:-2 }}</td>
                         {% endfor %}
                         <td>{{ qs_sum }}</td>
                     </tr>
@@ -66,7 +66,7 @@
                             <tr>
                                 {% for g in s %}
                                     <td>
-                                        {{ g }}
+                                        {{ g|floatformat:-2 }}
                                     </td>
                                 {% endfor %}
                             </tr>
@@ -92,11 +92,11 @@
                             <tr>
                                 {% for q in new_weights %}
                                     <td>
-                                        {{ q.re_eval }}
+                                        {{ q.re_eval|floatformat:-2 }}
                                         <input type="hidden" value="{{ q.re_eval }}" name="new_weights">
                                     </td>
                                 {% endfor %}
-                                <td>{{ new_weights_sum }}</td>
+                                <td>{{ new_weights_sum|floatformat:-2 }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -118,7 +118,7 @@
                                     <tr>
                                         {% for g in s %}
                                             <td>
-                                                {{ g }}
+                                                {{ g|floatformat:-2 }}
                                             </td>
                                         {% endfor %}
                                     </tr>
@@ -127,7 +127,7 @@
                             </table>
                         {% endif %}
 
-                        <label class="btn btn-default">
+                        <label class="btn btn-outline-secondary">
                             Upload Accuracy Matrix
                             <input type="file" style="display: none;" name="accuracy-matrix" id="acc-upload">
                         </label>
@@ -137,8 +137,8 @@
                 {% if request.POST.upload_data %}
                     <div id="sections">
                         {% for section in sections %}
-                            <div class="row">
-                                <div class="col-md-8 col-md-offset-2">
+                            <div class="row mt-2">
+                                <div class="col-md-8 offset-md-2">
                                     <div class="section">
                                         <h3>Define {{ section.eval_type }} of questions</h3>
                                         <div id="svg-{{ section.eval_type }}" class="svg-wrapper"></div>
@@ -152,8 +152,8 @@
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-8 col-md-offset-2">
+                            <div class="row mt-2">
+                                <div class="col-md-8 offset-md-2">
                                     <table class="table question-list">
                                         <thead>
                                         <tr>
@@ -180,8 +180,8 @@
                                 </div>
                             </div>
                         {% endfor %}
-                        <div class="row">
-                            <div class="col-md-8 col-md-offset-2">
+                        <div class="row mt-2">
+                            <div class="col-md-8 offset-md-2">
                                 <form method="post" id="data-by-teacher" enctype="multipart/form-data"
                                       class="pull-right">
                                     {% csrf_token %}
@@ -201,7 +201,11 @@
 
                 <form method="post">
                     {% csrf_token %}
-                    <button name="calc_eval" value="1" class="btn btn-primary">Calculate Student Evaluations</button>
+
+                    <button name="calc_eval" value="1" class="btn btn-primary {% if num_qs == 0 %}disabled{% endif %}">
+                        Calculate Student Evaluations
+                    </button>
+
                     <button name="upload_data" value="1" class="btn btn-primary">Provide data</button>
                 </form>
             </div>

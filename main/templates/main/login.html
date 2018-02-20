@@ -15,14 +15,14 @@
     {#        <div class="alert alert-info" id="login_notify">Logg på</div>#}
     {#    {% endif %}#}
 
-    <div class="col-md-4 col-md-offset-4">
+    <div class="col-md-4 offset-md-4">
 
         <form action="{% url 'main:login' %}" method="post" accept-charset="utf-8" id="loginform"
-              class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Log in</h3>
+              class="card">
+            <div class="card-header">
+                <h3 class="card-title">Log in</h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
 
                 {% csrf_token %}
 

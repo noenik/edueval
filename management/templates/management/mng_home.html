@@ -2,84 +2,63 @@
 {% block title %}Management{% endblock %}
 
 {% block content %}
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8 offset-md-2">
         <div class="row">
-            <div class="col-md-4">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="input-group">
-                        {{ courseform.code }}
-                        <span class="input-group-btn">
-                        <button class="btn btn-success col-md-12">Add course</button>
-                        </span>
-                    </div>
-                </form>
-            </div>
-            <div class="col-md-4 hidden-xs hidden-sm">
-                {% if selected_course %}
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="input-group">
-                            {{ examform.name }}
-                            <span class="input-group-btn">
-                            <button class="btn btn-success col-md-12">Add exam</button>
-                        </span>
-                        </div>
-                    </form>
-                {% endif %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
+            <div class="col-md-8 offset-md-3">
+                <div class="card">
+                    <div class="card-header">
                         My Courses
                     </div>
-                    <div class="panel-body">
+                    <div class="card-body">
                         {% if courses %}
                             Select a course to browse exams:
                             <div class="list-group">
                                 {% for course in courses %}
-                                    <a href="{% url 'manage:home_course' course=course.slug %}"
+                                    <a href="{% url 'manage:home_course' course.slug %}"
                                        class="list-group-item">{{ course.code }}</a>
                                 {% endfor %}
                             </div>
                         {% else %}
                             You have no courses
                         {% endif %}
+
+                        <form method="post" class="mt-2">
+                            {% csrf_token %}
+                            <div class="input-group">
+                                {{ courseform.code }}
+                                <span class="input-group-btn">
+                                <button class="btn btn-success col-md-12">Add course</button>
+                                </span>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="row mt-5">
             {% if selected_course %}
-                <div class="col-md-4 visible-xs visible-sm">
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="input-group">
-                            {{ examform.name }}
-                            <span class="input-group-btn">
-                            <button class="btn btn-success col-md-12">Add exam</button>
-                        </span>
-                        </div>
-                    </form>
-                </div>
-                <div class="col-md-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
+                <div class="col-md-8 offset-md-3">
+                    <div class="card">
+                        <div class="card-header">
                             Exams for {{ selected_course.code }}
                         </div>
-                        <div class="panel-body">
+                        <div class="card-body">
                             {% if exams %}
                                 Select exam to see and edit details:
                                 <div class="list-group">
                                     {% for exam in exams %}
                                         <div class="list-group-item">
                                             {{ exam.name }}
-                                        <span class="controls">
-                                            <a href="{% url 'manage:exam_change' exam_id=exam.id %}">
-                                                <i class="glyphicon glyphicon-edit"></i>
+                                            <span class="controls">
+                                            <a href="{% url 'manage:exam_change' exam_id=exam.id %}"
+                                               title="Change exam"
+                                               class="mr-1 ml-2">
+                                                <i class="oi oi-pencil"></i>
                                             </a>
-                                            <a href="{% url 'manage:exam_manage' exam_id=exam.id %}">
-                                                <i class="glyphicon glyphicon-signal"></i>
+                                            <a href="{% url 'manage:exam_manage' exam_id=exam.id %}"
+                                               title="View results">
+                                                <i class="oi oi-signal"></i>
                                             </a>
                                         </span>
                                         </div>
@@ -88,6 +67,16 @@
                             {% else %}
                                 There are no exams in this course
                             {% endif %}
+
+                            <form method="post" class="mt-2">
+                                {% csrf_token %}
+                                <div class="input-group">
+                                    {{ examform.name }}
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-success col-md-12">Add exam</button>
+                                    </span>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

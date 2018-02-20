@@ -8,20 +8,22 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8 offset-md-2 pb-5">
         <div class="page-header">
             <h1>{{ exam.name }}</h1>
         </div>
+        <a href="{% url 'manage:home_course' exam.course.slug %}"><button class="btn btn-outline-secondary">Back</button></a>
         {% if message %}
             <div class="row">
                 <div class="col-md-12">
                     <div class="alert alert-success">
                         {{ message }}
-                        <i class="glyphicon glyphicon-remove pull-right"></i>
+                        <i class="oi oi-x pull-right"></i>
                     </div>
                 </div>
             </div>
         {% endif %}
+
         <form method="post" id="mng-form">
             {% csrf_token %}
             <div class="row">
@@ -34,7 +36,7 @@
                                    class="form-control" contentEditable="false">
                             <span class="input-group-btn">
                                 <button class="btn btn-primary" title="Copy link to clipboard" id="copy-link-btn">
-                                    <i class="glyphicon glyphicon-copy"></i>
+                                    <i class="oi oi-clipboard"></i>
                                 </button>
                             </span>
                         </div>
@@ -89,18 +91,19 @@
                     <button class="btn btn-success" name="save_qs" value="1">Confirm</button>
                 </div>
             </div>
-            <div class="row">
+
+            <div class="row mt-5 mb-2">
                 <h2>Define default memberships</h2>
-                <div id="sections" class="col-md-8 col-md-offset-2">
+                <div id="sections" class="col-md-8 offset-md-2">
                     {% for section in mfa %}
                         <div class="section">
                             <h3>{{ section.eval_type }}</h3>
                             <div id="svg-{{ section.eval_type }}" class="svg-wrapper"></div>
                             <input type="hidden" class="section-type" value="{{ section.eval_type }}">
-                            <div class="form-inline">
+                            <div class="form-inline justify-content-center">
                                 {% for mf in section.membership_functions %}
                                     <input type="text" placeholder="Label for mf {{ mf.num }}"
-                                           class="form-control" name="label-mf{{ mf.num }}" value="{{ mf.label }}">
+                                           class="form-control col-md-2" name="label-mf{{ mf.num }}" value="{{ mf.label }}">
                                     {% for point in mf.mf %}
                                         <input class="mf{{ mf.num }}" type="hidden" value="{{ point }}">
                                     {% endfor %}

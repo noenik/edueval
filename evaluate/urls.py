@@ -1,7 +1,8 @@
-from django.conf.urls import url, include
+from django.urls import path
 import evaluate.views as views
 
 app_name = 'eval'
+
 urlpatterns = [
-    url(r'^(?P<url_hash>\w+)$', views.evaluate, name='evaluate')
+    path('<slug:url_hash>', views.evaluate, name='evaluate')
 ]
