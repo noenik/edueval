@@ -1,6 +1,3 @@
-import json
-# import matlab.engine
-import os
 import numpy as np
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
@@ -229,7 +226,7 @@ def infer_adjustment(eff, imp, rbs):
 # rbs = compile_rulebases()
 
 
-def evaluate(t, cmplx, imp, rbs, a=None):
+def evaluate(w, t, cmplx, imp, rbs, a=None):
     new_w = []
 
     if not a:
@@ -245,9 +242,9 @@ def evaluate(t, cmplx, imp, rbs, a=None):
         effort = infer_effort(diff, cm, rbs)
         adjustment = infer_adjustment(effort, im, rbs)
 
-        new_w.append((1 + adjustment) * G[i])
+        new_w.append((1 + adjustment) * w[i])
 
-    m = sum(G) / sum(new_w)
+    m = sum(w) / sum(new_w)
 
     new_w = [i * m for i in new_w]
 

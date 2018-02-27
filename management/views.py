@@ -1,20 +1,24 @@
 import csv
+import datetime
+import json
 import random
 import string
-import json
-import numpy as np
 from functools import reduce
 
+import matplotlib as mpl
+import numpy as np
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 from django.shortcuts import render, redirect
-from Stud_Eval import test
-from evaluate.models import ExamEvaluation
-from MembershipFunction import mf
+
 import management.forms as forms
 import management.models as mdls
 import management.slugger as slugify
-import datetime
+from MembershipFunction import mf
+from Stud_Eval import test
+from evaluate.models import ExamEvaluation
+
+mpl.use('Agg')
 
 
 @login_required
@@ -250,29 +254,38 @@ def gather_evaluation_results(exam_id):
     exam = mdls.Exam.objects.get(pk=exam_id)
     evals = ExamEvaluation.objects.filter(exam=exam)
     qs = mdls.ExamQuestion.objects.filter(exam=exam).order_by('number')
-    g = [q.teacher_eval for q in qs]
+    w = [q.teacher_eval for q in qs]
     c = []
     i = []
     t = []
+    c_mf = []
+    i_mf = []
 
     for e in evals:
         cur_eval = e.get_evaluation()
         cur_mfs = e.get_mf()
+        c_mf.append(cur_mfs['Complexity'])
+        i_mf.append(cur_mfs['Importance'])
         c.append(cur_eval['Complexity'])  # get_membership_degrees(cur_eval['Complexity'], cur_mfs['Complexity']))
         i.append(cur_eval['Importance'])  # get_membership_degrees(cur_eval['Importance'], cur_mfs['Importance']))
         t.append(e.get_time())
 
+    print(c_mf)
+
     c = calc_mean(np.array(c))
+    print(c)
     i = calc_mean(np.array(i))
     t = normalize_time(t)
+    c_mf = calc_mean(np.array(c_mf))
+    i_mf = calc_mean(np.array(i_mf))
 
-    rbs = test.compile_rulebases({'Complexity': [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]],
-                                  'Importance': [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]]})
+    rbs = test.compile_rulebases({'Complexity': c_mf,  # [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]],
+                                  'Importance': i_mf})  # [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]]})
 
     # print("Complexity:\n", c, "\nImportance:\n", i, "\nTime:\n", t)
     # print("Original weights:", g)
     # print("New weights", test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g))
-    return test.evaluate(t, c, i, rbs)  # test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g)
+    return test.evaluate(w, t, c, i, rbs)  # test.run_evaluation(t.tolist(), c.tolist(), i.tolist(), g)
 
 
 def get_membership_degrees(crisp_set, mfs):
