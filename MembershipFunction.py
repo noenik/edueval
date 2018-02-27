@@ -1,4 +1,4 @@
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy
 
 ans = []
@@ -117,18 +117,18 @@ def fuzzyfy(x):
     return returnvect
 
 
-if __name__ == '__main__':
-    # Create a range from 0 to 10 with a step of 0.1
-    numrange = numpy.arange(0, 10, 0.1)
-
-    # Call the fuzzyfy function with a set of vectors
-    mat = fuzzyfy([[5, 2], [2, 4, 6, 8], [6, 8]])
-
-    # For each vector returned by the fuzzyfy function, plot it over the range
-    for r in mat:
-        plt.plot(numrange, r)
-
-    # Define x and y axis
-    plt.axis([0, 10, 0, 1.5])
-    # Show the plot
-    plt.show()
+# if __name__ == '__main__':
+#     # Create a range from 0 to 10 with a step of 0.1
+#     numrange = numpy.arange(0, 10, 0.1)
+#
+#     # Call the fuzzyfy function with a set of vectors
+#     mat = fuzzyfy([[5, 2], [2, 4, 6, 8], [6, 8]])
+#
+#     # For each vector returned by the fuzzyfy function, plot it over the range
+#     for r in mat:
+#         plt.plot(numrange, r)
+#
+#     # Define x and y axis
+#     plt.axis([0, 10, 0, 1.5])
+#     # Show the plot
+#     plt.show()
