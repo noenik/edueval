@@ -1,4 +1,8 @@
+import matplotlib
 import numpy as np
+
+matplotlib.use("Agg")
+
 import skfuzzy as fuzz
 from skfuzzy import control as ctrl
 

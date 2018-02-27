@@ -5,7 +5,6 @@ import random
 import string
 from functools import reduce
 
-import matplotlib as mpl
 import numpy as np
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
@@ -17,8 +16,6 @@ import management.slugger as slugify
 from MembershipFunction import mf
 from Stud_Eval import test
 from evaluate.models import ExamEvaluation
-
-mpl.use('Agg')
 
 
 @login_required
