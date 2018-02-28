@@ -163,7 +163,7 @@ def exam_manage(request, exam_id):
         new_grades = []
 
         for l in accuracy:
-            old_grade, new_grade = zip(*[(ow*a, nw*a) for ow, nw, a in zip(weights, nw, l)])
+            old_grade, new_grade = zip(*[(ow * a, nw * a) for ow, nw, a in zip(weights, nw, l)])
             old_grade = list(old_grade)
             new_grade = list(new_grade)
             new_grade.append(sum(new_grade))
@@ -171,7 +171,7 @@ def exam_manage(request, exam_id):
             new_grades.append(new_grade)
             grades.append(old_grade)
 
-        context["new_weights"] = [{'number': i, 're_eval': w} for i, w in zip(range(1, len(nw)+1), nw)]
+        context["new_weights"] = [{'number': i, 're_eval': w} for i, w in zip(range(1, len(nw) + 1), nw)]
         context["new_weights_sum"] = sum(nw)
         context["new_grades"] = new_grades
         context["old_grades"] = grades
@@ -267,17 +267,16 @@ def gather_evaluation_results(exam_id):
         i.append(cur_eval['Importance'])  # get_membership_degrees(cur_eval['Importance'], cur_mfs['Importance']))
         t.append(e.get_time())
 
-    print(c_mf)
-
-    c = calc_mean(np.array(c))
-    print(c)
-    i = calc_mean(np.array(i))
+    c = calc_mean(c)
+    # print(c)
+    i = calc_mean(i)
     t = normalize_time(t)
-    c_mf = calc_mean(np.array(c_mf))
-    i_mf = calc_mean(np.array(i_mf))
+    c_mf = mat_calc_mean(c_mf)
+    i_mf = mat_calc_mean(i_mf)
 
-    rbs = test.compile_rulebases({'Complexity': c_mf,  # [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]],
-                                  'Importance': i_mf})  # [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]]})
+    rbs = test.compile_rulebases(
+        {'Complexity': c_mf,  # [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]],
+         'Importance': i_mf})  # [[0, 0, .1, .3], [.1, .3, .5], [.3, .5, .7], [.5, .7, .9], [.7, .9, 1, 1]]})
 
     # print("Complexity:\n", c, "\nImportance:\n", i, "\nTime:\n", t)
     # print("Original weights:", g)
@@ -295,15 +294,37 @@ def get_membership_degrees(crisp_set, mfs):
     return np.array([[mf(x, cmf) for cmf in mfs] for x in crisp_set])
 
 
-def calc_mean(mat_list):
+def calc_mean(lists):
+    """
+    Calculate element wise mean of a set of lists
+    :param lists: Lists for which to calculate a list of mean elements
+    :return: List of mean elements
+    """
+    num_eval = len(lists)
+    avg = reduce(lambda a, b: a + b, lists)
+    return [i/num_eval for i in avg]
+
+
+def mat_calc_mean(mat_list):
     """
     Calculate the mean values (element wise) for a set of matrices
     :param mat_list: List of matrices from which to calculate a mean matrix
     :return: Matrix of mean values
     """
     num_eval = len(mat_list)
-    added = reduce(lambda a, b: a + b, mat_list)
-    return added / num_eval
+    avg = reduce(lambda a, b: [list_sum(i, j) for i, j in zip(a, b)], mat_list)
+    return [[col / num_eval for col in row] for row in avg]
+
+
+def list_sum(a, b):
+    """
+    Element wise sum of two lists
+    E.g. [1, 2, 3] + [3, 5, 2] => [4, 7, 5]
+    :param a: List a
+    :param b: List b
+    :return: Summed list
+    """
+    return [i + j for i, j in zip(a, b)]
 
 
 def normalize_time(time_list):
